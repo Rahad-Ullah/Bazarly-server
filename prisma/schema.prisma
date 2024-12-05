@@ -60,8 +60,9 @@ model Customer {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  user  User    @relation(fields: [email], references: [email])
-  order Order[]
+  user   User     @relation(fields: [email], references: [email])
+  order  Order[]
+  review Review[]
 
   @@map("customers")
 }
@@ -124,6 +125,7 @@ model Product {
   shop      Shop        @relation(fields: [shopId], references: [id])
   category  Category    @relation(fields: [categoryId], references: [id])
   orderItem OrderItem[]
+  review    Review[]
 
   @@map("products")
 }
@@ -175,6 +177,23 @@ model OrderItem {
   product Product @relation(fields: [productId], references: [id])
 
   @@map("order_items")
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  rating     Int
+  comment    String?
+  productId  String
+  customerId String
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relationships
+  product  Product  @relation(fields: [productId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@map("reviews")
 }
 
 enum UserRole {
