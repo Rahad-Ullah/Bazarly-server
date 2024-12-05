@@ -60,10 +60,11 @@ model Customer {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  user         User           @relation(fields: [email], references: [email])
-  order        Order[]
-  review       Review[]
-  followedShop FollowedShop[]
+  user                User                  @relation(fields: [email], references: [email])
+  order               Order[]
+  review              Review[]
+  followedShop        FollowedShop[]
+  recentViewedProduct RecentViewedProduct[]
 
   @@map("customers")
 }
@@ -124,11 +125,12 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  shop      Shop        @relation(fields: [shopId], references: [id])
-  category  Category    @relation(fields: [categoryId], references: [id])
-  orderItem OrderItem[]
-  review    Review[]
-  flashSale FlashSale[]
+  shop                Shop                  @relation(fields: [shopId], references: [id])
+  category            Category              @relation(fields: [categoryId], references: [id])
+  orderItem           OrderItem[]
+  review              Review[]
+  flashSale           FlashSale[]
+  recentViewedProduct RecentViewedProduct[]
 
   @@map("products")
 }
@@ -243,6 +245,19 @@ model FollowedShop {
   shop     Shop     @relation(fields: [shopId], references: [id])
 
   @@map("followed_shops")
+}
+
+model RecentViewedProduct {
+  id         String   @id @default(uuid())
+  customerId String
+  productId  String
+  viewedAt   DateTime
+
+  // Relationships
+  customer Customer @relation(fields: [customerId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+
+  @@map("recent_viewed_products")
 }
 
 enum UserRole {
