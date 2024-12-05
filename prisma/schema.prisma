@@ -152,20 +152,21 @@ model Category {
 }
 
 model Order {
-  id            String        @id @default(uuid())
+  id            String             @id @default(uuid())
   customerId    String
   shopId        String
   totalAmount   Float
-  status        OrderStatus   @default(PROCESSING)
+  status        OrderStatus        @default(PROCESSING)
   paymentType   PaymentType
-  paymentStatus PaymentStatus @default(UNPAID)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  paymentStatus OrderPaymentStatus @default(UNPAID)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
 
   // Relationships
   customer  Customer    @relation(fields: [customerId], references: [id])
   shop      Shop        @relation(fields: [shopId], references: [id])
   orderItem OrderItem[]
+  payment   Payment[]
 
   @@map("orders")
 }
@@ -274,7 +275,19 @@ model AdminActivity {
   @@map("admin_activities")
 }
 
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String
+  transactionId String?
+  amount        Float
+  paymentMethod PaymentMethod @default(AMARPAY)
+  status        PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
 
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
 
 enum UserRole {
   SUPER_ADMIN
@@ -300,7 +313,18 @@ enum PaymentType {
   COD
 }
 
-enum PaymentStatus {
+enum OrderPaymentStatus {
   PAID
   UNPAID
+}
+
+enum PaymentMethod {
+  STRIPE
+  AMARPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
 }
