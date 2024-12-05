@@ -26,6 +26,7 @@ model User {
   // Relationships
   admin    Admin?
   customer Customer?
+  vendor   Vendor?
 
   @@map("users")
 }
@@ -62,6 +63,25 @@ model Customer {
   user User @relation(fields: [email], references: [email])
 
   @@map("customers")
+}
+
+model Vendor {
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  name               String
+  phoneNumber        String
+  profilePhoto       String?
+  tradeLicenseNumber String?
+  taxId              String?
+  businessAddress    String?
+  isDeleted          Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relationships
+  user User @relation(fields: [email], references: [email])
+
+  @@map("vendors")
 }
 
 enum UserRole {
