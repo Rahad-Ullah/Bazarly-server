@@ -119,9 +119,25 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  shop Shop @relation(fields: [shopId], references: [id])
+  shop     Shop     @relation(fields: [shopId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@map("products")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  parentId    String?
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  product Product[]
+
+  @@map("categories")
 }
 
 enum UserRole {
