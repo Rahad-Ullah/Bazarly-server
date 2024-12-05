@@ -79,9 +79,28 @@ model Vendor {
   updatedAt          DateTime @updatedAt
 
   // Relationships
-  user User @relation(fields: [email], references: [email])
+  user User  @relation(fields: [email], references: [email])
+  shop Shop?
 
   @@map("vendors")
+}
+
+model Shop {
+  id          String   @id @default(uuid())
+  vendorId    String   @unique
+  name        String   @unique
+  description String
+  logoUrl     String
+  phoneNumber String
+  shopAddress String
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+
+  @@map("shops")
 }
 
 enum UserRole {
