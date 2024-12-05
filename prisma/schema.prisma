@@ -43,7 +43,8 @@ model Admin {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  user User @relation(fields: [email], references: [email])
+  user          User            @relation(fields: [email], references: [email])
+  adminActivity AdminActivity[]
 
   @@map("admins")
 }
@@ -259,6 +260,21 @@ model RecentViewedProduct {
 
   @@map("recent_viewed_products")
 }
+
+model AdminActivity {
+  id        String   @id @default(uuid())
+  adminId   String
+  action    String
+  details   String
+  createdAt DateTime @default(now())
+
+  // Relationships
+  admin Admin @relation(fields: [adminId], references: [id])
+
+  @@map("admin_activities")
+}
+
+
 
 enum UserRole {
   SUPER_ADMIN
