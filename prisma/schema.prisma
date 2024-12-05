@@ -214,6 +214,21 @@ model FlashSale {
   @@map("flash_sales")
 }
 
+model Coupon {
+  id             String   @id @default(uuid())
+  code           String   @unique
+  discountAmount Float
+  startTime      DateTime
+  endTime        DateTime
+  usageLimit     Int
+  usedCount      Int
+  isDeleted      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("coupons")
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN
