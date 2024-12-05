@@ -13,7 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id                 String     @id @default(uuid())
   email              String     @unique
@@ -25,9 +24,26 @@ model User {
   updatedAt          DateTime   @updatedAt
 
   // Relationships
-
+  admin Admin?
 
   @@map("users")
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  phoneNumber  String
+  profilePhoto String?
+  designation  String?
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  user User @relation(fields: [email], references: [email])
+
+  @@map("admins")
 }
 
 enum UserRole {
