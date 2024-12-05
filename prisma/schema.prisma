@@ -60,7 +60,8 @@ model Customer {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  user User @relation(fields: [email], references: [email])
+  user  User    @relation(fields: [email], references: [email])
+  order Order[]
 
   @@map("customers")
 }
@@ -100,6 +101,7 @@ model Shop {
   // Relationships
   vendor  Vendor    @relation(fields: [vendorId], references: [id])
   product Product[]
+  order   Order[]
 
   @@map("shops")
 }
@@ -138,6 +140,24 @@ model Category {
   product Product[]
 
   @@map("categories")
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  customerId    String
+  shopId        String
+  totalAmount   Float
+  status        OrderStatus   @default(PROCESSING)
+  paymentType   PaymentType
+  paymentStatus PaymentStatus @default(UNPAID)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relationships
+  customer Customer @relation(fields: [customerId], references: [id])
+  shop     Shop     @relation(fields: [shopId], references: [id])
+
+  @@map("orders")
 }
 
 enum UserRole {
