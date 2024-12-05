@@ -60,9 +60,10 @@ model Customer {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  user   User     @relation(fields: [email], references: [email])
-  order  Order[]
-  review Review[]
+  user         User           @relation(fields: [email], references: [email])
+  order        Order[]
+  review       Review[]
+  followedShop FollowedShop[]
 
   @@map("customers")
 }
@@ -100,9 +101,10 @@ model Shop {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  vendor  Vendor    @relation(fields: [vendorId], references: [id])
-  product Product[]
-  order   Order[]
+  vendor       Vendor         @relation(fields: [vendorId], references: [id])
+  product      Product[]
+  order        Order[]
+  followedShop FollowedShop[]
 
   @@map("shops")
 }
@@ -227,6 +229,20 @@ model Coupon {
   updatedAt      DateTime @updatedAt
 
   @@map("coupons")
+}
+
+model FollowedShop {
+  id         String   @id @default(uuid())
+  customerId String
+  shopId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relationships
+  customer Customer @relation(fields: [customerId], references: [id])
+  shop     Shop     @relation(fields: [shopId], references: [id])
+
+  @@map("followed_shops")
 }
 
 enum UserRole {
