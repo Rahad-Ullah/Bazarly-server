@@ -126,6 +126,7 @@ model Product {
   category  Category    @relation(fields: [categoryId], references: [id])
   orderItem OrderItem[]
   review    Review[]
+  flashSale FlashSale[]
 
   @@map("products")
 }
@@ -194,6 +195,23 @@ model Review {
   customer Customer @relation(fields: [customerId], references: [id])
 
   @@map("reviews")
+}
+
+model FlashSale {
+  id              String   @id @default(uuid())
+  productId       String
+  title           String
+  discountPercent Float
+  startTime       DateTime
+  endTime         DateTime
+  isDeleted       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("flash_sales")
 }
 
 enum UserRole {
