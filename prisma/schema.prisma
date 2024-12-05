@@ -24,7 +24,8 @@ model User {
   updatedAt          DateTime   @updatedAt
 
   // Relationships
-  admin Admin?
+  admin    Admin?
+  customer Customer?
 
   @@map("users")
 }
@@ -44,6 +45,23 @@ model Admin {
   user User @relation(fields: [email], references: [email])
 
   @@map("admins")
+}
+
+model Customer {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  phoneNumber  String
+  profilePhoto String?
+  address      String?
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  user User @relation(fields: [email], references: [email])
+
+  @@map("customers")
 }
 
 enum UserRole {
