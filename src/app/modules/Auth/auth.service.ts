@@ -5,10 +5,15 @@ import { UserStatus } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { jwtHelpers } from "../../utils/jwtHelpers";
 import config from "../../../config";
+import { JwtPayload } from "jsonwebtoken";
 
 interface ILogin {
   email: string;
   password: string;
+}
+interface IChangePassword {
+  oldPassword: string;
+  newPassword: string;
 }
 
 const loginIntoDB = async (payload: ILogin) => {
@@ -61,6 +66,7 @@ const loginIntoDB = async (payload: ILogin) => {
   };
 };
 
+// Refresh token
 const refreshToken = async (token: string) => {
   let decodedData;
   try {
@@ -98,7 +104,50 @@ const refreshToken = async (token: string) => {
   };
 };
 
+// change password
+const changePassword = async (user: JwtPayload, payload: IChangePassword) => {
+  // check if the user is valid
+  const userData = await prisma.user.findUnique({
+    where: {
+      email: user.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User does not exist");
+  }
+
+  // verify old password
+  const isCorrectPassword = await bcrypt.compare(
+    payload.oldPassword,
+    userData.password
+  );
+  if (!isCorrectPassword) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Password incorrect");
+  }
+
+  // hash the new password
+  const hashedPassword = await bcrypt.hash(payload.newPassword, 12);
+
+  // update the password
+  await prisma.user.update({
+    where: {
+      email: userData.email,
+      status: UserStatus.ACTIVE,
+    },
+    data: {
+      password: hashedPassword,
+      needPasswordChange: false,
+    },
+  });
+
+  return {
+    message: "Password changed successfully",
+  };
+};
+
 export const AuthServices = {
   loginIntoDB,
   refreshToken,
+  changePassword,
 };
