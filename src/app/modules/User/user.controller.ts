@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 import { UserServices } from "./user.service";
+import { Request } from "express";
 
 const createAdmin = catchAsync(async (req, res) => {
   const result = await UserServices.createAdminIntoDB(req);
@@ -50,9 +51,21 @@ const changeUserStatus = catchAsync(async (req, res) => {
   });
 });
 
+const getMyProfile = catchAsync(async (req: Request & { user?: any }, res) => {
+  const result = await UserServices.getMyProfileFromDB(req.user);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Profile retrieved successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createAdmin,
   createVendor,
   createCustomer,
   changeUserStatus,
+  getMyProfile,
 };

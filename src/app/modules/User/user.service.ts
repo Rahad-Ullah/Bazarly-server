@@ -4,6 +4,7 @@ import ApiError from "../../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
 import * as bcrypt from "bcrypt";
 import { UserRole, UserStatus } from "@prisma/client";
+import { TAuthUser } from "../../interface/common";
 
 const createAdminIntoDB = async (req: Request) => {
   // check if the user is already exists
@@ -145,9 +146,46 @@ const changeUserStatusIntoDB = async (
   return result;
 };
 
+const getMyProfileFromDB = async (user: TAuthUser) => {
+  // check if user is exist
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user?.email,
+      status: UserStatus.ACTIVE,
+    },
+    select: {
+      id: true,
+      email: true,
+      needPasswordChange: true,
+      role: true,
+      status: true,
+    },
+  });
+
+  // get profile data based on role
+  let profileInfo;
+
+  if (userInfo.role === "SUPER_ADMIN" || "ADMIN") {
+    profileInfo = await prisma.admin.findUnique({
+      where: { email: userInfo.email },
+    });
+  } else if (userInfo.role === "VENDOR") {
+    profileInfo = await prisma.vendor.findUnique({
+      where: { email: userInfo.email },
+    });
+  } else if (userInfo.role === "CUSTOMER") {
+    profileInfo = await prisma.customer.findUnique({
+      where: { email: userInfo.email },
+    });
+  }
+
+  return { ...userInfo, ...profileInfo };
+};
+
 export const UserServices = {
   createAdminIntoDB,
   createVendorIntoDB,
   createCustomerIntoDB,
   changeUserStatusIntoDB,
+  getMyProfileFromDB,
 };
