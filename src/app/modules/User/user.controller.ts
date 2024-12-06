@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 import { UserServices } from "./user.service";
 import { Request } from "express";
+import { TAuthUser } from "../../interface/common";
 
 const createAdmin = catchAsync(async (req, res) => {
   const result = await UserServices.createAdminIntoDB(req);
@@ -62,10 +63,27 @@ const getMyProfile = catchAsync(async (req: Request & { user?: any }, res) => {
   });
 });
 
+const updateMyProfile = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res) => {
+    const result = await UserServices.updateMyProfile(
+      req.user as TAuthUser,
+      req
+    );
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "User profile updated successfully",
+      data: result,
+    });
+  }
+);
+
 export const UserControllers = {
   createAdmin,
   createVendor,
   createCustomer,
   changeUserStatus,
   getMyProfile,
+  updateMyProfile,
 };

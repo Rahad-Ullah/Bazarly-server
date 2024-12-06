@@ -1,14 +1,15 @@
-import express from 'express';
-import { UserControllers } from './user.controller';
+import express, { NextFunction, Request, Response } from "express";
+import { UserControllers } from "./user.controller";
 import validateRequest from "../../middlewares/validateRequest";
 import { UserValidations } from "./user.validation";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
+import { fileUploader } from "../../utils/fileUploader";
 
 const router = express.Router();
 
 router.get(
-  "/me",
+  "/get-profile",
   auth(
     UserRole.SUPER_ADMIN,
     UserRole.ADMIN,
@@ -41,9 +42,24 @@ router.post(
 
 router.patch(
   "/:id/status",
-  // auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   validateRequest(UserValidations.changeUserStatus),
   UserControllers.changeUserStatus
 );
 
-export const UserRoutes = router
+router.patch(
+  "/update-profile",
+  auth(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.VENDOR,
+    UserRole.CUSTOMER
+  ),
+  fileUploader.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    return UserControllers.updateMyProfile(req, res, next);
+  }
+);
+
+export const UserRoutes = router;

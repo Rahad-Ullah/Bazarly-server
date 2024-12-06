@@ -5,7 +5,10 @@ import { StatusCodes } from "http-status-codes";
 import * as bcrypt from "bcrypt";
 import { UserRole, UserStatus } from "@prisma/client";
 import { TAuthUser } from "../../interface/common";
+import { IUploadedFile } from "../../interface/file";
+import { fileUploader } from "../../utils/fileUploader";
 
+// ********---create admin ---*******
 const createAdminIntoDB = async (req: Request) => {
   // check if the user is already exists
   const isUserExists = await prisma.user.findUnique({
@@ -44,6 +47,7 @@ const createAdminIntoDB = async (req: Request) => {
   return result;
 };
 
+// ********---create vendor ---*******
 const createVendorIntoDB = async (req: Request) => {
   // check if the user is already exists
   const isUserExists = await prisma.user.findUnique({
@@ -82,6 +86,7 @@ const createVendorIntoDB = async (req: Request) => {
   return result;
 };
 
+// ********---create customer ---*******
 const createCustomerIntoDB = async (req: Request) => {
   // check if the user is already exists
   const isUserExists = await prisma.user.findUnique({
@@ -120,7 +125,7 @@ const createCustomerIntoDB = async (req: Request) => {
   return result;
 };
 
-// change user status
+// ********--- change user status ---*******
 const changeUserStatusIntoDB = async (
   id: string,
   payload: { status: UserStatus }
@@ -146,6 +151,7 @@ const changeUserStatusIntoDB = async (
   return result;
 };
 
+// ********--- get profile ---*******
 const getMyProfileFromDB = async (user: TAuthUser) => {
   // check if user is exist
   const userInfo = await prisma.user.findUniqueOrThrow({
@@ -182,10 +188,53 @@ const getMyProfileFromDB = async (user: TAuthUser) => {
   return { ...userInfo, ...profileInfo };
 };
 
+// ********--- update profile ---*******
+const updateMyProfile = async (user: TAuthUser, req: Request) => {
+  // check if the user exists
+  const userInfo = await prisma.user.findUnique({
+    where: {
+      email: user?.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+  if (!userInfo) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User does not exists");
+  }
+
+  // upload profile photo to cloudinary
+  const file = req.file as IUploadedFile;
+  if (file) {
+    const uploadedFile = await fileUploader.uploadToCloudinary(file);
+    req.body.profilePhoto = uploadedFile?.secure_url;
+  }
+
+  // update user profile based on their role
+  let updatedData;
+  if (userInfo.role === "SUPER_ADMIN" || userInfo.role === "ADMIN") {
+    updatedData = await prisma.admin.update({
+      where: { email: userInfo.email },
+      data: req.body,
+    });
+  } else if (userInfo.role === "VENDOR") {
+    updatedData = await prisma.vendor.update({
+      where: { email: userInfo.email },
+      data: req.body,
+    });
+  } else if (userInfo.role === "CUSTOMER") {
+    updatedData = await prisma.customer.update({
+      where: { email: userInfo.email },
+      data: req.body,
+    });
+  }
+
+  return updatedData;
+};
+
 export const UserServices = {
   createAdminIntoDB,
   createVendorIntoDB,
   createCustomerIntoDB,
   changeUserStatusIntoDB,
   getMyProfileFromDB,
+  updateMyProfile,
 };
