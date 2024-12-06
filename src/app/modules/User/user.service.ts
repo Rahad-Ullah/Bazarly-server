@@ -39,6 +39,41 @@ const createAdminIntoDB = async (req: Request) => {
   return result;
 };
 
+const createVendorIntoDB = async (req: Request) => {
+  // check if the user is already exists
+  const isUserExists = await prisma.user.findUnique({
+    where: {
+      email: req.body.data.email,
+    },
+  });
+  if (isUserExists) {
+    throw new ApiError(StatusCodes.CONFLICT, "Vendor already exists!");
+  }
+
+  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
+
+  const userData = {
+    email: req.body.data.email,
+    password: hashedPassword,
+    role: UserRole.VENDOR,
+  };
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    await transactionClient.user.create({
+      data: userData,
+    });
+
+    const createdVendorData = await transactionClient.vendor.create({
+      data: req.body.data,
+    });
+
+    return createdVendorData;
+  });
+
+  return result;
+};
+
 export const UserServices = {
   createAdminIntoDB,
+  createVendorIntoDB,
 };

@@ -36,7 +36,7 @@ model Admin {
   email        String   @unique
   name         String
   phoneNumber  String
-  profilePhoto String?
+  profilePhoto String?  @default("https://cdn-icons-png.flaticon.com/512/6596/6596121.png")
   designation  String?
   isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())
@@ -54,7 +54,7 @@ model Customer {
   email        String   @unique
   name         String
   phoneNumber  String
-  profilePhoto String?
+  profilePhoto String?  @default("https://cdn-icons-png.flaticon.com/512/6596/6596121.png")
   address      String?
   isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())
@@ -75,7 +75,7 @@ model Vendor {
   email              String   @unique
   name               String
   phoneNumber        String
-  profilePhoto       String?
+  profilePhoto       String?  @default("https://cdn-icons-png.flaticon.com/512/6596/6596121.png")
   tradeLicenseNumber String?
   taxId              String?
   businessAddress    String?
