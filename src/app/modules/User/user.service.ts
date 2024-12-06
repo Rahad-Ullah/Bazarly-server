@@ -3,7 +3,7 @@ import prisma from "../../shared/prisma";
 import ApiError from "../../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
 import * as bcrypt from "bcrypt";
-import { UserRole } from "@prisma/client";
+import { UserRole, UserStatus } from "@prisma/client";
 
 const createAdminIntoDB = async (req: Request) => {
   // check if the user is already exists
@@ -16,8 +16,10 @@ const createAdminIntoDB = async (req: Request) => {
     throw new ApiError(StatusCodes.CONFLICT, "Admin already exists!");
   }
 
+  // hash the password
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
+  // prepare data for user table
   const userData = {
     email: req.body.data.email,
     password: hashedPassword,
@@ -25,10 +27,12 @@ const createAdminIntoDB = async (req: Request) => {
   };
 
   const result = await prisma.$transaction(async (transactionClient) => {
+    // create into user table
     await transactionClient.user.create({
       data: userData,
     });
 
+    // create into admin table
     const createdAdminData = await transactionClient.admin.create({
       data: req.body.data,
     });
@@ -50,8 +54,10 @@ const createVendorIntoDB = async (req: Request) => {
     throw new ApiError(StatusCodes.CONFLICT, "Vendor already exists!");
   }
 
+  // hash the password
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
+  // prepare data for user table
   const userData = {
     email: req.body.data.email,
     password: hashedPassword,
@@ -59,10 +65,12 @@ const createVendorIntoDB = async (req: Request) => {
   };
 
   const result = await prisma.$transaction(async (transactionClient) => {
+    // create into user table
     await transactionClient.user.create({
       data: userData,
     });
 
+    // create into vendor table
     const createdVendorData = await transactionClient.vendor.create({
       data: req.body.data,
     });
@@ -72,7 +80,6 @@ const createVendorIntoDB = async (req: Request) => {
 
   return result;
 };
-
 
 const createCustomerIntoDB = async (req: Request) => {
   // check if the user is already exists
@@ -85,8 +92,10 @@ const createCustomerIntoDB = async (req: Request) => {
     throw new ApiError(StatusCodes.CONFLICT, "Customer already exists!");
   }
 
+  // hash the password
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
+  // prepare data for user table
   const userData = {
     email: req.body.data.email,
     password: hashedPassword,
@@ -94,10 +103,12 @@ const createCustomerIntoDB = async (req: Request) => {
   };
 
   const result = await prisma.$transaction(async (transactionClient) => {
+    // create into user table
     await transactionClient.user.create({
       data: userData,
     });
 
+    // create into customer table
     const createdCustomerData = await transactionClient.customer.create({
       data: req.body.data,
     });
@@ -108,8 +119,35 @@ const createCustomerIntoDB = async (req: Request) => {
   return result;
 };
 
+// change user status
+const changeUserStatusIntoDB = async (
+  id: string,
+  payload: { status: UserStatus }
+) => {
+  // check if user is exist
+  const userData = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User not exist");
+  }
+
+  // update user status
+  const result = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+
+  return result;
+};
+
 export const UserServices = {
   createAdminIntoDB,
   createVendorIntoDB,
   createCustomerIntoDB,
+  changeUserStatusIntoDB,
 };

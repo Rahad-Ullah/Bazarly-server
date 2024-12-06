@@ -23,9 +23,16 @@ router.post(
 
 router.post(
   "/create-customer",
-  // auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   validateRequest(UserValidations.createCustomer),
   UserControllers.createCustomer
+);
+
+router.patch(
+  "/:id/status",
+  // auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  validateRequest(UserValidations.changeUserStatus),
+  UserControllers.changeUserStatus
 );
 
 export const UserRoutes = router

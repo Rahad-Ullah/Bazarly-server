@@ -36,8 +36,23 @@ const createCustomer = catchAsync(async (req, res) => {
   });
 });
 
+const changeUserStatus = catchAsync(async (req, res) => {
+  const result = await UserServices.changeUserStatusIntoDB(
+    req.params.id,
+    req.body
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Status changed successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createAdmin,
   createVendor,
   createCustomer,
+  changeUserStatus,
 };
