@@ -25,7 +25,19 @@ const createVendor = catchAsync(async (req, res) => {
   });
 });
 
+const createCustomer = catchAsync(async (req, res) => {
+  const result = await UserServices.createCustomerIntoDB(req);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Customer created successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createAdmin,
   createVendor,
+  createCustomer,
 };
