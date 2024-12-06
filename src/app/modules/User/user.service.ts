@@ -165,7 +165,7 @@ const getMyProfileFromDB = async (user: TAuthUser) => {
   // get profile data based on role
   let profileInfo;
 
-  if (userInfo.role === "SUPER_ADMIN" || "ADMIN") {
+  if (userInfo.role === "SUPER_ADMIN" || userInfo.role === "ADMIN") {
     profileInfo = await prisma.admin.findUnique({
       where: { email: userInfo.email },
     });
