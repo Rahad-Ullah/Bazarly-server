@@ -33,4 +33,10 @@ router.post(
   AuthControllers.forgotPassword
 );
 
+router.post(
+  "/reset-password",
+  validateRequest(AuthValidations.resetPassword),
+  AuthControllers.resetPassword
+);
+
 export const AuthRoutes = router;

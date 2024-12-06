@@ -5,7 +5,7 @@ import { UserStatus } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { jwtHelpers } from "../../utils/jwtHelpers";
 import config from "../../../config";
-import { JwtPayload } from "jsonwebtoken";
+import { JwtPayload, Secret } from "jsonwebtoken";
 import emailSender from "../../utils/emailSender";
 
 interface ILogin {
@@ -184,9 +184,48 @@ const forgotPassword = async (payload: { email: string }) => {
   );
 };
 
+// reset password -------
+const resetPassword = async (
+  token: string,
+  payload: { id: string; password: string }
+) => {
+  // check if the user valid
+  const userData = await prisma.user.findUnique({
+    where: {
+      id: payload.id,
+      status: UserStatus.ACTIVE,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "User does not exist");
+  }
+
+  // verify token
+  const isValidToken = jwtHelpers.verifyToken(
+    token,
+    config.jwt.reset_pass_secret as Secret
+  );
+  if (!isValidToken) {
+    throw new ApiError(StatusCodes.FORBIDDEN, "Forbidden!");
+  }
+
+  // hash password
+  const hashedPassword = await bcrypt.hash(payload.password, 12);
+
+  // update password into DB
+  const result = await prisma.user.update({
+    where: {
+      id: payload.id,
+    },
+    data: { password: hashedPassword },
+  });
+  return result;
+};
+
 export const AuthServices = {
   loginIntoDB,
   refreshToken,
   changePassword,
   forgotPassword,
+  resetPassword,
 };
