@@ -6,6 +6,7 @@ import * as bcrypt from "bcrypt";
 import { jwtHelpers } from "../../utils/jwtHelpers";
 import config from "../../../config";
 import { JwtPayload } from "jsonwebtoken";
+import emailSender from "../../utils/emailSender";
 
 interface ILogin {
   email: string;
@@ -146,8 +147,46 @@ const changePassword = async (user: JwtPayload, payload: IChangePassword) => {
   };
 };
 
+// forgot password
+const forgotPassword = async (payload: { email: string }) => {
+  const userData = await prisma.user.findUnique({
+    where: {
+      email: payload.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "User not found");
+  }
+
+  // generate reset token for sending by email
+  const resetPassToken = jwtHelpers.generateToken(
+    { email: userData.email, role: userData.role, status: userData.status },
+    config.jwt.reset_pass_secret as string,
+    config.jwt.reset_pass_expires_in as string
+  );
+  // generate reset link for sending by email
+  const resetPassLink = `${config.reset_pass_link}?id=${userData.id}&token=${resetPassToken}`;
+
+  // send email
+  await emailSender(
+    userData.email,
+    `
+      <div>
+        <p>Dear User,</p>
+        <p>Your password reset link:
+          <a href=${resetPassLink}>
+            <button>Reset Password</button>
+          </a>
+        </p>
+      </div>
+      `
+  );
+};
+
 export const AuthServices = {
   loginIntoDB,
   refreshToken,
   changePassword,
+  forgotPassword,
 };

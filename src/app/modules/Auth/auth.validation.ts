@@ -20,7 +20,15 @@ const changePassword = z.object({
   }),
 });
 
+
+const forgotPassword = z.object({
+  body: z.object({
+    email: z.string().email({ message: "Email must be a valid email address" }),
+  }),
+});
+
 export const AuthValidations = {
   login,
   changePassword,
+  forgotPassword,
 };
