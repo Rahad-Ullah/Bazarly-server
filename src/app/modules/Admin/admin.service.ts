@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../errors/ApiError";
 import prisma from "../../shared/prisma";
-import { Admin, Prisma } from "@prisma/client";
+import { Admin, Prisma, UserStatus } from "@prisma/client";
 import { IPaginationOptions } from "../../interface/pagination";
 import { IAdminFilterRequest } from "./admin.interface";
 import { calculatePagination } from "../../utils/pagination";
@@ -109,41 +109,82 @@ const updateAdminIntoDB = async (id: string, payload: Partial<Admin>) => {
 
 // **********--- delete admin ---**********
 const deleteAdminFromDB = async (id: string) => {
-    // check if the admin is exist
-    const userData = await prisma.admin.findUnique({
+  // check if the admin is exist
+  const userData = await prisma.admin.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist");
+  }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    // delete from admin table
+    const adminDeletedData = await transactionClient.admin.delete({
       where: {
         id,
-        isDeleted: false,
       },
     });
-    if(!userData){
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist")
-    }
-  
-    const result = await prisma.$transaction(async (transactionClient) => {
-      // delete from admin table
-      const adminDeletedData = await transactionClient.admin.delete({
-        where: {
-          id,
-        },
-      });
-  
-      // delete from user table
-      await transactionClient.user.delete({
-        where: {
-          email: adminDeletedData.email,
-        },
-      });
-  
-      return adminDeletedData;
+
+    // delete from user table
+    await transactionClient.user.delete({
+      where: {
+        email: adminDeletedData.email,
+      },
     });
-  
-    return result;
-  };
+
+    return adminDeletedData;
+  });
+
+  return result;
+};
+
+// **********--- soft delete admin ---**********
+const softDeleteAdminFromDB = async (id: string) => {
+  // check if the admin is exist
+  const userData = await prisma.admin.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist");
+  }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    // delete from admin table
+    const adminDeletedData = await transactionClient.admin.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    // delete from user table
+    await transactionClient.user.update({
+      where: {
+        email: adminDeletedData.email,
+      },
+      data: {
+        status: UserStatus.DELETED,
+      },
+    });
+
+    return adminDeletedData;
+  });
+
+  return result;
+};
 
 export const AdminServices = {
   getSingleAdminFromDB,
   getAllAdminsFromDB,
   updateAdminIntoDB,
-  deleteAdminFromDB
+  deleteAdminFromDB,
+  softDeleteAdminFromDB,
 };
