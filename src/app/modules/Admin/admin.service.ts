@@ -1,12 +1,13 @@
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../errors/ApiError";
 import prisma from "../../shared/prisma";
-import { Prisma } from "@prisma/client";
+import { Admin, Prisma } from "@prisma/client";
 import { IPaginationOptions } from "../../interface/pagination";
 import { IAdminFilterRequest } from "./admin.interface";
 import { calculatePagination } from "../../utils/pagination";
 import { adminSearchableFields } from "./admin.constant";
 
+// **********--- get all admins ---**********
 const getAllAdminsFromDB = async (
   params: IAdminFilterRequest,
   options: IPaginationOptions
@@ -68,6 +69,7 @@ const getAllAdminsFromDB = async (
   };
 };
 
+// **********--- get single admin ---**********
 const getSingleAdminFromDB = async (email: string) => {
   const result = await prisma.admin.findUnique({
     where: {
@@ -83,7 +85,30 @@ const getSingleAdminFromDB = async (email: string) => {
   return result;
 };
 
+// **********--- update admin ---**********
+const updateAdminIntoDB = async (id: string, payload: Partial<Admin>) => {
+  // check if the admin is exist
+  const userData = await prisma.admin.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist");
+  }
+
+  const result = await prisma.admin.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+  return result;
+};
+
 export const AdminServices = {
   getSingleAdminFromDB,
   getAllAdminsFromDB,
+  updateAdminIntoDB,
 };
