@@ -78,10 +78,6 @@ const getSingleAdminFromDB = async (email: string) => {
     },
   });
 
-  if (!result) {
-    throw new ApiError(StatusCodes.NOT_FOUND, "Admin not found");
-  }
-
   return result;
 };
 

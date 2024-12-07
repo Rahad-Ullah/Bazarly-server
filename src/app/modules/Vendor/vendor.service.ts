@@ -78,10 +78,6 @@ const getSingleVendorFromDB = async (email: string) => {
     },
   });
 
-  if (!result) {
-    throw new ApiError(StatusCodes.NOT_FOUND, "Vendor not found");
-  }
-
   return result;
 };
 
