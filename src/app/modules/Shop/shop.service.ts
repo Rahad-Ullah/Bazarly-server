@@ -196,6 +196,29 @@ const updateShopIntoDB = async (id: string, req: Request) => {
   return result;
 };
 
+// *********--- change shop status ---*********
+const changeStatusIntoDB = async (id: string, payload: Partial<Shop>) => {
+  // check if the shop exists
+  const shopData = await prisma.shop.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!shopData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "The shop does not exists");
+  }
+
+  const result = await prisma.shop.update({
+    where: {
+      id: shopData.id,
+    },
+    data: payload,
+  });
+
+  return result;
+};
+
 // *********--- delete shop ---*********
 const deleteShopFromDB = async (user: TAuthUser, id: string) => {
     // check if the user is valid
@@ -236,4 +259,5 @@ export const ShopServices = {
   getVendorShopsFromDB,
   updateShopIntoDB,
   deleteShopFromDB,
+  changeStatusIntoDB,
 };

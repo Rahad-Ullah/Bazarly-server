@@ -80,6 +80,18 @@ const updateShop = catchAsync(async (req, res) => {
     });
   });
 
+// change shop status
+const changeShopStatus = catchAsync(async (req, res) => {
+    const result = await ShopServices.changeStatusIntoDB(req.params.id, req.body)
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Shop status changed successfully",
+        data: result,
+    });
+  });
+
 // update shop
 const deleteShop = catchAsync(async (req: Request & {user?: TAuthUser}, res) => {
     const result = await ShopServices.deleteShopFromDB(
@@ -101,5 +113,6 @@ export const ShopControllers = {
   getSingleShop,
   getVendorShops,
   updateShop,
-  deleteShop
+  deleteShop,
+  changeShopStatus,
 };

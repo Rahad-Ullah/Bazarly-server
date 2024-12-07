@@ -3,6 +3,8 @@ import { ShopControllers } from "./shop.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 import { fileUploader } from "../../utils/fileUploader";
+import validateRequest from "../../middlewares/validateRequest";
+import { ShopValidations } from "./shop.validation";
 
 const router = express.Router();
 
@@ -50,10 +52,12 @@ router.patch(
 );
 
 // change shop status
-// router.patch(
-//     "/change-status/:id",
-//     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), ShopControllers.
-// );
+router.patch(
+  "/change-status/:id",
+  validateRequest(ShopValidations.changeShopStatus),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  ShopControllers.changeShopStatus
+);
 
 // delete shop
 router.delete(
