@@ -12,6 +12,12 @@ router.get(
   ShopControllers.getAllShops
 );
 
+router.get(
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.VENDOR),
+  ShopControllers.getSingleShop
+);
+
 router.post(
   "/create",
   auth(UserRole.VENDOR),

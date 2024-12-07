@@ -40,7 +40,22 @@ const getAllShops = catchAsync(async (req, res) => {
   });
 });
 
+// get single shop
+const getSingleShop = catchAsync(async (req, res) => {
+    const result = await ShopServices.getSingleShopFromDB(
+      req.params.id
+    );
+  
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Shop retrieved successfully",
+      data: result,
+    });
+  });
+
 export const ShopControllers = {
   createShop,
   getAllShops,
+  getSingleShop,
 };

@@ -127,7 +127,20 @@ const getAllShopsFromDB = async (
   };
 };
 
+// *********--- retrieve single shop ---*********
+const getSingleShopFromDB = async (id: string) => {
+    const result = await prisma.shop.findUnique({
+        where: {
+            id,
+            isDeleted: false
+        }
+    })
+
+    return result
+}
+
 export const ShopServices = {
   createShopIntoDB,
   getAllShopsFromDB,
+  getSingleShopFromDB,
 };
