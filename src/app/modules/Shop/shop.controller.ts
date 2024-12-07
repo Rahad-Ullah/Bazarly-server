@@ -68,14 +68,29 @@ const getVendorShops = catchAsync(async (req, res) => {
     });
   });
 
-  // update shop
+// update shop
 const updateShop = catchAsync(async (req, res) => {
     const result = await ShopServices.updateShopIntoDB(req.params.id, req)
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Shop updated successfully",
+        data: result,
+    });
+  });
+
+// update shop
+const deleteShop = catchAsync(async (req: Request & {user?: TAuthUser}, res) => {
+    const result = await ShopServices.deleteShopFromDB(
+        req.user as TAuthUser,
+        req.params.id
+    )
   
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
-      message: "Shop updated successfully",
+      message: "Shop deleted successfully",
       data: result,
     });
   });
@@ -86,4 +101,5 @@ export const ShopControllers = {
   getSingleShop,
   getVendorShops,
   updateShop,
+  deleteShop
 };

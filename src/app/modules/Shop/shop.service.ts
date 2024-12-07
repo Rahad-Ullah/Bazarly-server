@@ -196,10 +196,44 @@ const updateShopIntoDB = async (id: string, req: Request) => {
   return result;
 };
 
+// *********--- delete shop ---*********
+const deleteShopFromDB = async (user: TAuthUser, id: string) => {
+    // check if the user is valid
+    const userData = await prisma.vendor.findUnique({
+        where: {
+            email: user?.email,
+            user: {
+                status: UserStatus.ACTIVE
+            }
+        }
+    })
+    if(!userData){
+        throw new ApiError(StatusCodes.UNAUTHORIZED, "User is not authourized");
+    }
+
+    // check if the shop is valid
+    await prisma.shop.findUniqueOrThrow({
+        where: {
+            id,
+            isDeleted: false
+        }
+    })
+
+    const result = await prisma.shop.delete({
+        where: {
+            id
+        }
+    })
+
+    return result
+}
+
+
 export const ShopServices = {
   createShopIntoDB,
   getAllShopsFromDB,
   getSingleShopFromDB,
   getVendorShopsFromDB,
   updateShopIntoDB,
+  deleteShopFromDB,
 };

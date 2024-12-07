@@ -49,4 +49,16 @@ router.patch(
   }
 );
 
+// change shop status
+// router.patch(
+//     "/change-status/:id",
+//     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), ShopControllers.
+// );
+
+// delete shop
+router.delete(
+    "/:id",
+    auth(UserRole.VENDOR), ShopControllers.deleteShop
+);
+
 export const ShopRoutes = router;

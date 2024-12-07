@@ -91,16 +91,17 @@ model Vendor {
 }
 
 model Shop {
-  id          String   @id @default(uuid())
-  vendorId    String   @unique
-  name        String   @unique
+  id          String     @id @default(uuid())
+  vendorId    String     @unique
+  name        String     @unique
   description String
   logoUrl     String
   phoneNumber String
   shopAddress String
-  isDeleted   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      ShopStatus @default(ACTIVE)
+  isDeleted   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   // Relationships
   vendor       Vendor         @relation(fields: [vendorId], references: [id])
@@ -298,6 +299,14 @@ enum UserRole {
 
 enum UserStatus {
   ACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum ShopStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
   BLOCKED
   DELETED
 }
