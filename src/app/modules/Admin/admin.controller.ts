@@ -2,6 +2,23 @@ import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 import { AdminServices } from "./admin.service";
+import { adminFilterableFields } from "./admin.constant";
+import pick from "../../utils/pick";
+import { paginationOptions } from "../../utils/pagination";
+
+const getAllAdmins = catchAsync(async (req, res) => {
+  const filters = pick(req.query, adminFilterableFields);
+  const options = pick(req.query, paginationOptions);
+  const result = await AdminServices.getAllAdminsFromDB(filters, options);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Admin retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
 
 // get single admin
 const getSingleAdmin = catchAsync(async (req, res) => {
@@ -17,4 +34,5 @@ const getSingleAdmin = catchAsync(async (req, res) => {
 
 export const AdminControllers = {
   getSingleAdmin,
+  getAllAdmins,
 };
