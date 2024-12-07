@@ -7,7 +7,11 @@ import { AdminValidations } from "./admin.validation";
 
 const router = express.Router();
 
-router.get("/", AdminControllers.getAllAdmins);
+router.get(
+  "/",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  AdminControllers.getAllAdmins
+);
 
 router.get(
   "/:email",
