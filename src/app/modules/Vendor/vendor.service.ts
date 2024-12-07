@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../errors/ApiError";
 import prisma from "../../shared/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, UserStatus, Vendor } from "@prisma/client";
 import { IPaginationOptions } from "../../interface/pagination";
 import { calculatePagination } from "../../utils/pagination";
 import { IVendorFilterRequest } from "./vendor.interface";
@@ -69,7 +69,7 @@ const getAllVendorsFromDB = async (
   };
 };
 
-// **********--- get single admin ---**********
+// **********--- get single vendor ---**********
 const getSingleVendorFromDB = async (email: string) => {
   const result = await prisma.vendor.findUnique({
     where: {
@@ -85,103 +85,106 @@ const getSingleVendorFromDB = async (email: string) => {
   return result;
 };
 
-// // **********--- update admin ---**********
-// const updateAdminIntoDB = async (id: string, payload: Partial<Admin>) => {
-//   // check if the admin is exist
-//   const userData = await prisma.admin.findUnique({
-//     where: {
-//       id,
-//       isDeleted: false,
-//     },
-//   });
-//   if (!userData) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist");
-//   }
+// **********--- update vendor ---**********
+const updateVendorIntoDB = async (id: string, payload: Partial<Vendor>) => {
+  // check if the user is exist
+  const userData = await prisma.vendor.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Vendor does not exist");
+  }
 
-//   const result = await prisma.admin.update({
-//     where: {
-//       id,
-//     },
-//     data: payload,
-//   });
-//   return result;
-// };
+  const result = await prisma.vendor.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+  return result;
+};
 
-// // **********--- delete admin ---**********
-// const deleteAdminFromDB = async (id: string) => {
-//   // check if the admin is exist
-//   const userData = await prisma.admin.findUnique({
-//     where: {
-//       id,
-//       isDeleted: false,
-//     },
-//   });
-//   if (!userData) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist");
-//   }
+// **********--- delete vendor ---**********
+const deleteVendorFromDB = async (id: string) => {
+  // check if the user is exist
+  const userData = await prisma.vendor.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Vendor does not exist");
+  }
 
-//   const result = await prisma.$transaction(async (transactionClient) => {
-//     // delete from admin table
-//     const adminDeletedData = await transactionClient.admin.delete({
-//       where: {
-//         id,
-//       },
-//     });
+  const result = await prisma.$transaction(async (transactionClient) => {
+    // delete from vendor table
+    const vendorDeletedData = await transactionClient.vendor.delete({
+      where: {
+        id,
+      },
+    });
 
-//     // delete from user table
-//     await transactionClient.user.delete({
-//       where: {
-//         email: adminDeletedData.email,
-//       },
-//     });
+    // delete from user table
+    await transactionClient.user.delete({
+      where: {
+        email: vendorDeletedData.email,
+      },
+    });
 
-//     return adminDeletedData;
-//   });
+    return vendorDeletedData;
+  });
 
-//   return result;
-// };
+  return result;
+};
 
-// // **********--- soft delete admin ---**********
-// const softDeleteAdminFromDB = async (id: string) => {
-//   // check if the admin is exist
-//   const userData = await prisma.admin.findUnique({
-//     where: {
-//       id,
-//       isDeleted: false,
-//     },
-//   });
-//   if (!userData) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist");
-//   }
+// **********--- soft delete vendor ---**********
+const softDeleteVendorFromDB = async (id: string) => {
+  // check if the user is exist
+  const userData = await prisma.vendor.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Vendor does not exist");
+  }
 
-//   const result = await prisma.$transaction(async (transactionClient) => {
-//     // delete from admin table
-//     const adminDeletedData = await transactionClient.admin.update({
-//       where: {
-//         id,
-//       },
-//       data: {
-//         isDeleted: true,
-//       },
-//     });
+  const result = await prisma.$transaction(async (transactionClient) => {
+    // delete from vendor table
+    const vendorDeletedData = await transactionClient.vendor.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
 
-//     // delete from user table
-//     await transactionClient.user.update({
-//       where: {
-//         email: adminDeletedData.email,
-//       },
-//       data: {
-//         status: UserStatus.DELETED,
-//       },
-//     });
+    // delete from user table
+    await transactionClient.user.update({
+      where: {
+        email: vendorDeletedData.email,
+      },
+      data: {
+        status: UserStatus.DELETED,
+      },
+    });
 
-//     return adminDeletedData;
-//   });
+    return vendorDeletedData;
+  });
 
-//   return result;
-// };
+  return result;
+};
 
 export const VendorServices = {
   getAllVendorsFromDB,
   getSingleVendorFromDB,
+  updateVendorIntoDB,
+  deleteVendorFromDB,
+  softDeleteVendorFromDB,
 };

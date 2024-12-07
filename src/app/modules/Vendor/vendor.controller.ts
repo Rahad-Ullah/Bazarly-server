@@ -32,41 +32,44 @@ const getSingleVendor = catchAsync(async (req, res) => {
   });
 });
 
-// // update admin
-// const updateAdmin = catchAsync(async (req, res) => {
-//     const result = await AdminServices.updateAdminIntoDB(req.params.id, req.body);
+// update vendor
+const updateVendor = catchAsync(async (req, res) => {
+    const result = await VendorServices.updateVendorIntoDB(req.params.id, req.body);
 
-//     sendResponse(res, {
-//       statusCode: StatusCodes.OK,
-//       success: true,
-//       message: "Admin updated successfully",
-//       data: result,
-//     });
-//   });
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Vendor updated successfully",
+      data: result,
+    });
+  });
 
-//   const deleteAdmin = catchAsync(async (req, res) => {
-//     const result = await AdminServices.deleteAdminFromDB(req.params.id);
+  const deleteVendor = catchAsync(async (req, res) => {
+    const result = await VendorServices.deleteVendorFromDB(req.params.id);
 
-//     sendResponse(res, {
-//       statusCode: StatusCodes.OK,
-//       success: true,
-//       message: "Admin deleted successfully",
-//       data: result,
-//     });
-//   });
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Vendor deleted successfully",
+      data: result,
+    });
+  });
 
-//   const softDeleteAdmin = catchAsync(async (req, res) => {
-//     const result = await AdminServices.softDeleteAdminFromDB(req.params.id);
+  const softDeleteVendor = catchAsync(async (req, res) => {
+    const result = await VendorServices.softDeleteVendorFromDB(req.params.id);
 
-//     sendResponse(res, {
-//       statusCode: 200,
-//       success: true,
-//       message: "Admin deleted successfully",
-//       data: result,
-//     });
-//   });
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Vendor deleted successfully",
+      data: result,
+    });
+  });
 
 export const VendorControllers = {
   getAllVendors,
   getSingleVendor,
+  updateVendor,
+  deleteVendor,
+  softDeleteVendor,
 };
