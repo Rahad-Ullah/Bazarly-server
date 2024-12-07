@@ -1,4 +1,4 @@
-import { Prisma, Shop } from "@prisma/client";
+import { Prisma, Shop, UserStatus } from "@prisma/client";
 import { TAuthUser } from "../../interface/common";
 import { Request } from "express";
 import prisma from "../../shared/prisma";
@@ -13,24 +13,13 @@ import { customerSearchableFields } from "../Customer/customer.constant";
 
 // *********--- create shop ---*********
 const createShopIntoDB = async (user: TAuthUser, req: Request) => {
-  // check if the shop already exists
-  const shopData = await prisma.shop.findUnique({
-    where: {
-      name: req.body.name,
-    },
-  });
-  if (shopData) {
-    throw new ApiError(
-      StatusCodes.CONFLICT,
-      "Shop name is not available. Someone already using it."
-    );
-  }
-
-  // find the vendor
+  // check if the vendor is valid
   const vendorData = await prisma.vendor.findUniqueOrThrow({
     where: {
       email: user?.email,
-      isDeleted: false,
+      user: {
+        status: UserStatus.ACTIVE,
+      },
     },
   });
 
@@ -47,10 +36,23 @@ const createShopIntoDB = async (user: TAuthUser, req: Request) => {
     );
   }
 
+  // check if the shop already exists
+  const shopData = await prisma.shop.findUnique({
+    where: {
+      name: req.body.name,
+    },
+  });
+  if (shopData) {
+    throw new ApiError(
+      StatusCodes.CONFLICT,
+      "Shop name is not available. Someone already using it."
+    );
+  }
+
   // set vendorId to body data
   req.body.vendorId = vendorData.id;
 
-  // upload profile photo to cloudinary
+  // upload logo photo to cloudinary
   const file = req.file as IUploadedFile;
   if (file) {
     const uploadedFile = await fileUploader.uploadToCloudinary(file);
@@ -129,18 +131,75 @@ const getAllShopsFromDB = async (
 
 // *********--- retrieve single shop ---*********
 const getSingleShopFromDB = async (id: string) => {
-    const result = await prisma.shop.findUnique({
-        where: {
-            id,
-            isDeleted: false
-        }
-    })
+  const result = await prisma.shop.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
 
-    return result
-}
+  return result;
+};
+
+// *********--- retrieve vendor shops ---*********
+const getVendorShopsFromDB = async (vendorId: string) => {
+  // check if vendor is valid
+  const vendorData = await prisma.vendor.findUnique({
+    where: {
+      id: vendorId,
+      user: {
+        status: UserStatus.ACTIVE,
+      },
+    },
+  });
+  if (!vendorData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Vendor does not exist");
+  }
+
+  const result = await prisma.shop.findMany({
+    where: {
+      vendorId,
+      isDeleted: false,
+    },
+  });
+
+  return result;
+};
+
+// *********--- update shop ---*********
+const updateShopIntoDB = async (id: string, req: Request) => {
+  // check if the shop exists
+  const shopData = await prisma.shop.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!shopData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "The shop does not exists");
+  }
+
+  // upload logo photo to cloudinary
+  const file = req.file as IUploadedFile;
+  if (file) {
+    const uploadedFile = await fileUploader.uploadToCloudinary(file);
+    req.body.logoUrl = uploadedFile?.secure_url;
+  }
+
+  const result = await prisma.shop.update({
+    where: {
+      id: shopData.id,
+    },
+    data: req.body,
+  });
+
+  return result;
+};
 
 export const ShopServices = {
   createShopIntoDB,
   getAllShopsFromDB,
   getSingleShopFromDB,
+  getVendorShopsFromDB,
+  updateShopIntoDB,
 };

@@ -54,8 +54,36 @@ const getSingleShop = catchAsync(async (req, res) => {
     });
   });
 
+// get vendor shops
+const getVendorShops = catchAsync(async (req, res) => {
+    const result = await ShopServices.getVendorShopsFromDB(
+      req.params.vendorId
+    );
+  
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Shops retrieved successfully",
+      data: result,
+    });
+  });
+
+  // update shop
+const updateShop = catchAsync(async (req, res) => {
+    const result = await ShopServices.updateShopIntoDB(req.params.id, req)
+  
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Shop updated successfully",
+      data: result,
+    });
+  });
+
 export const ShopControllers = {
   createShop,
   getAllShops,
   getSingleShop,
+  getVendorShops,
+  updateShop,
 };
