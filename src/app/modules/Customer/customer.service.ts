@@ -103,82 +103,84 @@ const updateCustomerIntoDB = async (id: string, payload: Partial<Customer>) => {
   return result;
 };
 
-// // **********--- delete admin ---**********
-// const deleteAdminFromDB = async (id: string) => {
-//   // check if the admin is exist
-//   const userData = await prisma.admin.findUnique({
-//     where: {
-//       id,
-//       isDeleted: false,
-//     },
-//   });
-//   if (!userData) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist");
-//   }
+// **********--- delete customer ---**********
+const deleteCustomerFromDB = async (id: string) => {
+  // check if the user is exist
+  const userData = await prisma.customer.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Customer does not exist");
+  }
 
-//   const result = await prisma.$transaction(async (transactionClient) => {
-//     // delete from admin table
-//     const adminDeletedData = await transactionClient.admin.delete({
-//       where: {
-//         id,
-//       },
-//     });
+  const result = await prisma.$transaction(async (transactionClient) => {
+    // delete from customer table
+    const customerDeletedData = await transactionClient.customer.delete({
+      where: {
+        id,
+      },
+    });
 
-//     // delete from user table
-//     await transactionClient.user.delete({
-//       where: {
-//         email: adminDeletedData.email,
-//       },
-//     });
+    // delete from user table
+    await transactionClient.user.delete({
+      where: {
+        email: customerDeletedData.email,
+      },
+    });
 
-//     return adminDeletedData;
-//   });
+    return customerDeletedData;
+  });
 
-//   return result;
-// };
+  return result;
+};
 
-// // **********--- soft delete admin ---**********
-// const softDeleteAdminFromDB = async (id: string) => {
-//   // check if the admin is exist
-//   const userData = await prisma.admin.findUnique({
-//     where: {
-//       id,
-//       isDeleted: false,
-//     },
-//   });
-//   if (!userData) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist");
-//   }
+// **********--- soft delete customer ---**********
+const softDeleteCustomerFromDB = async (id: string) => {
+  // check if the customer is exist
+  const userData = await prisma.customer.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!userData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Customer does not exist");
+  }
 
-//   const result = await prisma.$transaction(async (transactionClient) => {
-//     // delete from admin table
-//     const adminDeletedData = await transactionClient.admin.update({
-//       where: {
-//         id,
-//       },
-//       data: {
-//         isDeleted: true,
-//       },
-//     });
+  const result = await prisma.$transaction(async (transactionClient) => {
+    // delete from customer table
+    const customerDeletedData = await transactionClient.customer.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
 
-//     // delete from user table
-//     await transactionClient.user.update({
-//       where: {
-//         email: adminDeletedData.email,
-//       },
-//       data: {
-//         status: UserStatus.DELETED,
-//       },
-//     });
+    // delete from user table
+    await transactionClient.user.update({
+      where: {
+        email: customerDeletedData.email,
+      },
+      data: {
+        status: UserStatus.DELETED,
+      },
+    });
 
-//     return adminDeletedData;
-//   });
+    return customerDeletedData;
+  });
 
-//   return result;
-// };
+  return result;
+};
 
 export const CustomerServices = {
   getAllCustomersFromDB,
   getSingleCustomerFromDB,
   updateCustomerIntoDB,
+  deleteCustomerFromDB,
+  softDeleteCustomerFromDB,
 };

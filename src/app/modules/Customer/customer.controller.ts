@@ -49,30 +49,34 @@ const updateCustomer = catchAsync(async (req, res) => {
   });
 });
 
-//   const deleteAdmin = catchAsync(async (req, res) => {
-//     const result = await AdminServices.deleteAdminFromDB(req.params.id);
+// delete customer
+  const deleteCustomer = catchAsync(async (req, res) => {
+    const result = await CustomerServices.deleteCustomerFromDB(req.params.id);
 
-//     sendResponse(res, {
-//       statusCode: StatusCodes.OK,
-//       success: true,
-//       message: "Admin deleted successfully",
-//       data: result,
-//     });
-//   });
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Customer deleted successfully",
+      data: result,
+    });
+  });
 
-//   const softDeleteAdmin = catchAsync(async (req, res) => {
-//     const result = await AdminServices.softDeleteAdminFromDB(req.params.id);
+// soft delete customer
+  const softDeleteCustomer = catchAsync(async (req, res) => {
+    const result = await CustomerServices.softDeleteCustomerFromDB(req.params.id);
 
-//     sendResponse(res, {
-//       statusCode: 200,
-//       success: true,
-//       message: "Admin deleted successfully",
-//       data: result,
-//     });
-//   });
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Customer deleted successfully",
+      data: result,
+    });
+  });
 
 export const CustomerControllers = {
   getAllCustomers,
   getSingleCustomer,
   updateCustomer,
+  deleteCustomer,
+  softDeleteCustomer
 };
