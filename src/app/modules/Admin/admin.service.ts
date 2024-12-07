@@ -107,8 +107,43 @@ const updateAdminIntoDB = async (id: string, payload: Partial<Admin>) => {
   return result;
 };
 
+// **********--- delete admin ---**********
+const deleteAdminFromDB = async (id: string) => {
+    // check if the admin is exist
+    const userData = await prisma.admin.findUnique({
+      where: {
+        id,
+        isDeleted: false,
+      },
+    });
+    if(!userData){
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Admin does not exist")
+    }
+  
+    const result = await prisma.$transaction(async (transactionClient) => {
+      // delete from admin table
+      const adminDeletedData = await transactionClient.admin.delete({
+        where: {
+          id,
+        },
+      });
+  
+      // delete from user table
+      await transactionClient.user.delete({
+        where: {
+          email: adminDeletedData.email,
+        },
+      });
+  
+      return adminDeletedData;
+    });
+  
+    return result;
+  };
+
 export const AdminServices = {
   getSingleAdminFromDB,
   getAllAdminsFromDB,
   updateAdminIntoDB,
+  deleteAdminFromDB
 };
