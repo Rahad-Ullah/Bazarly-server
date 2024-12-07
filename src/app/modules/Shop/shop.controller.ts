@@ -4,6 +4,9 @@ import { sendResponse } from "../../shared/sendResponse";
 import { ShopServices } from "./shop.service";
 import { Request } from "express";
 import { TAuthUser } from "../../interface/common";
+import pick from "../../utils/pick";
+import { paginationOptions } from "../../utils/pagination";
+import { shopFilterableFields } from "./shop.constant";
 
 // create a new shop
 const createShop = catchAsync(
@@ -22,6 +25,22 @@ const createShop = catchAsync(
   }
 );
 
+// get all shops
+const getAllShops = catchAsync(async (req, res) => {
+  const filters = pick(req.query, shopFilterableFields);
+  const options = pick(req.query, paginationOptions);
+  const result = await ShopServices.getAllShopsFromDB(filters, options);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Shops retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 export const ShopControllers = {
   createShop,
+  getAllShops,
 };

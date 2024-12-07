@@ -6,6 +6,12 @@ import { fileUploader } from "../../utils/fileUploader";
 
 const router = express.Router();
 
+router.get(
+  "/",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  ShopControllers.getAllShops
+);
+
 router.post(
   "/create",
   auth(UserRole.VENDOR),
