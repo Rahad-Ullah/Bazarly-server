@@ -100,8 +100,53 @@ const getSingleCategoryFromDB = async (id: string) => {
   return result;
 };
 
+// *********--- update category ---*********
+const updateCategoryIntoDB = async (id: string, payload: Partial<Category>) => {
+  // check if category exists
+  const categoryData = await prisma.category.findUnique({
+    where: {
+      id
+    }
+  })
+  if(!categoryData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Category does not exist")
+  }
+  
+  const result = await prisma.category.update({
+    where: {
+      id
+    },
+    data: payload
+  })
+
+  return result;
+};
+
+// *********--- delete category ---*********
+const deleteCategoryFromDB = async (id: string) => {
+    // check if category exists
+    const categoryData = await prisma.category.findUnique({
+      where: {
+        id
+      }
+    })
+    if(!categoryData) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Category does not exist")
+    }
+  
+  const result = await prisma.category.delete({
+    where: {
+      id
+    }
+  })
+
+  return result;
+};
+
 export const CategoryServices = {
   createCategoryIntoDB,
   getAllCategoriesFromDB,
   getSingleCategoryFromDB,
+  updateCategoryIntoDB,
+  deleteCategoryFromDB,
 };

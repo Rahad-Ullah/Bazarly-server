@@ -8,6 +8,15 @@ const create = z.object({
   }),
 });
 
+const update = z.object({
+  body: z.object({
+    name: z.string().optional(),
+    description: z.string().optional(),
+    parentId: z.string().optional(),
+  }),
+});
+
 export const CategoryValidations = {
   create,
+  update,
 };
