@@ -16,6 +16,12 @@ router.post(
   }
 );
 
+router.post(
+  "/duplicate",
+  auth(UserRole.VENDOR),
+  ProductControllers.duplicateProduct
+);
+
 router.patch(
   "/:id",
   auth(UserRole.VENDOR),
@@ -29,5 +35,7 @@ router.patch(
 router.get("/:id", ProductControllers.getSingleProduct);
 
 router.get("/", ProductControllers.getAllProducts);
+
+router.delete("/:id", auth(UserRole.VENDOR), ProductControllers.deleteProduct);
 
 export const ProductRoutes = router;

@@ -113,7 +113,7 @@ model Shop {
 }
 
 model Product {
-  id          String   @id @default(uuid())
+  id          String        @id @default(uuid())
   shopId      String
   categoryId  String
   name        String
@@ -122,9 +122,10 @@ model Product {
   stock       Int
   discount    Float
   image       String
-  isDeleted   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      ProductStatus @default(DRAFT)
+  isDeleted   Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   // Relationships
   shop                Shop                  @relation(fields: [shopId], references: [id])
@@ -308,6 +309,14 @@ enum ShopStatus {
   PENDING
   SUSPENDED
   BLOCKED
+  DELETED
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  PAUSED
+  ARCHIVED
   DELETED
 }
 

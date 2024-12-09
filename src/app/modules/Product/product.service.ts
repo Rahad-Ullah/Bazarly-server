@@ -42,11 +42,24 @@ const createProductIntoDB = async (user: TAuthUser, req: Request) => {
     req.body.image = uploadedFile?.secure_url;
   }
 
-  console.log(req.body);
+  // set status as ACTIVE
+  req.body.status = "ACTIVE";
 
   // create product
   const result = await prisma.product.create({
     data: req.body,
+  });
+
+  return result;
+};
+
+// **********--- duplicate product ---*********
+const duplicateProductIntoDB = async (payload: Product) => {
+  const { id, ...productWithoutId } = payload;
+
+  // create product
+  const result = await prisma.product.create({
+    data: productWithoutId,
   });
 
   return result;
@@ -107,7 +120,8 @@ const getAllProductsFromDB = async (
 ) => {
   // format params and options information
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
-  const { searchTerm, category, minPrice, maxPrice, ...filterData } = params;
+  const { searchTerm, category, minPrice, maxPrice, shopId, ...filterData } =
+    params;
 
   const conditions: Prisma.ProductWhereInput[] = [];
 
@@ -175,6 +189,13 @@ const getAllProductsFromDB = async (
     });
   }
 
+  // filter if shopId specified
+  if (shopId) {
+    conditions.push({
+      shopId,
+    });
+  }
+
   // filter non deleted items
   conditions.push({
     isDeleted: false,
@@ -204,9 +225,41 @@ const getAllProductsFromDB = async (
     data: result,
   };
 };
+
+// *********--- retrieve all products ---*********
+const deleteProductFromDB = async (user: TAuthUser, id: string) => {
+  // check if the product is exists
+  const productData = await prisma.product.findUnique({
+    where: {
+      id,
+      shop: {
+        vendor: {
+          email: user?.email,
+        },
+      },
+    },
+  });
+  if (!productData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Product does not exist");
+  }
+
+  const result = await prisma.product.update({
+    where: {
+      id,
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
+
+  return result;
+};
+
 export const ProductServices = {
   createProductIntoDB,
+  duplicateProductIntoDB,
   updateProductIntoDB,
   getSingleProductFromDB,
   getAllProductsFromDB,
+  deleteProductFromDB,
 };
