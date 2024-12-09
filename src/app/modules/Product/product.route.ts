@@ -16,4 +16,18 @@ router.post(
   }
 );
 
+router.patch(
+  "/:id",
+  auth(UserRole.VENDOR),
+  fileUploader.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    return ProductControllers.updateProduct(req, res, next);
+  }
+);
+
+router.get("/:id", ProductControllers.getSingleProduct);
+
+router.get("/", ProductControllers.getAllProducts);
+
 export const ProductRoutes = router;

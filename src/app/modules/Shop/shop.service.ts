@@ -9,7 +9,7 @@ import { StatusCodes } from "http-status-codes";
 import { IShopFilterRequest } from "./shop.interface";
 import { IPaginationOptions } from "../../interface/pagination";
 import { calculatePagination } from "../../utils/pagination";
-import { customerSearchableFields } from "../Customer/customer.constant";
+import { shopSearchableFields } from "./shop.constant";
 
 // *********--- create shop ---*********
 const createShopIntoDB = async (user: TAuthUser, req: Request) => {
@@ -81,7 +81,7 @@ const getAllShopsFromDB = async (
   // filter if search term specified
   if (searchTerm) {
     conditions.push({
-      OR: customerSearchableFields.map((value) => ({
+      OR: shopSearchableFields.map((value) => ({
         [value]: {
           contains: searchTerm,
           mode: "insensitive",
