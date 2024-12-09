@@ -159,7 +159,7 @@ model Order {
   shopId        String
   totalAmount   Float
   status        OrderStatus        @default(PROCESSING)
-  paymentType   PaymentType
+  paymentType   PaymentType        @default(ONLINE)
   paymentStatus OrderPaymentStatus @default(UNPAID)
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
