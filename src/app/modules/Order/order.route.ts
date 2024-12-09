@@ -7,6 +7,19 @@ import { OrderValidations } from "./order.validation";
 
 const router = express.Router();
 
+router.get(
+  "/:id",
+  auth(
+    UserRole.CUSTOMER,
+    UserRole.VENDOR,
+    UserRole.ADMIN,
+    UserRole.SUPER_ADMIN
+  ),
+  OrderControllers.getSingleOrder
+);
+
+// router.get("/", auth(UserRole.CUSTOMER, UserRole.), OrderControllers.getSingleOrder);
+
 router.post(
   "/create",
   auth(UserRole.CUSTOMER),

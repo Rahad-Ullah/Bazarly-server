@@ -84,8 +84,22 @@ const changePaymentStatusIntoDB = async (
   return result;
 };
 
+// ********--- get single order ---********
+const getSingleOrderFromDB = async (
+    id: string,
+  ) => {
+    const result = await prisma.order.findUnique({
+      where: {
+        id,
+      }
+    });
+  
+    return result;
+  };
+
 export const OrderServices = {
   createOrderIntoDB,
   changeOrderStatusIntoDB,
   changePaymentStatusIntoDB,
+  getSingleOrderFromDB,
 };

@@ -56,8 +56,25 @@ const changePaymentStatus = catchAsync(
     }
   );
 
+  // get single order
+const getSingleOrder = catchAsync(
+    async (req, res) => {
+      const result = await OrderServices.getSingleOrderFromDB(
+        req.params.id
+      );
+  
+      sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Order retrieved successfully",
+        data: result,
+      });
+    }
+  );
+
 export const OrderControllers = {
   createOrder,
   changeOrderStatus,
-  changePaymentStatus
+  changePaymentStatus,
+  getSingleOrder,
 };
