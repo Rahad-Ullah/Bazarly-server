@@ -22,6 +22,42 @@ const createOrder = catchAsync(
   }
 );
 
+// change order status
+const changeOrderStatus = catchAsync(
+    async (req: Request & { user?: TAuthUser }, res) => {
+      const result = await OrderServices.changeOrderStatusIntoDB(
+        req.params.id,
+        req.body
+      );
+  
+      sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Order status changed successfully",
+        data: result,
+      });
+    }
+  );
+
+// change payment status
+const changePaymentStatus = catchAsync(
+    async (req, res) => {
+      const result = await OrderServices.changePaymentStatusIntoDB(
+        req.params.id,
+        req.body
+      );
+  
+      sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Payment status changed successfully",
+        data: result,
+      });
+    }
+  );
+
 export const OrderControllers = {
   createOrder,
+  changeOrderStatus,
+  changePaymentStatus
 };

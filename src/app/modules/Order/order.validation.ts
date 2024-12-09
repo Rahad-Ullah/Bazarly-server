@@ -1,4 +1,4 @@
-import { PaymentType } from "@prisma/client";
+import { OrderPaymentStatus, OrderStatus, PaymentType } from "@prisma/client";
 import { z } from "zod";
 
 const create = z.object({
@@ -11,6 +11,25 @@ const create = z.object({
   }),
 });
 
+const changeOrderStatus = z.object({
+  body: z.object({
+    status: z.enum([
+      OrderStatus.PROCESSING,
+      OrderStatus.SHIPPED,
+      OrderStatus.DELIVERED,
+      OrderStatus.CANCELLED,
+    ]),
+  }),
+});
+
+const changePaymentStatus = z.object({
+  body: z.object({
+    paymentStatus: z.enum([OrderPaymentStatus.PAID, OrderPaymentStatus.UNPAID]),
+  }),
+});
+
 export const OrderValidations = {
   create,
+  changeOrderStatus,
+  changePaymentStatus,
 };

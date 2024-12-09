@@ -14,4 +14,18 @@ router.post(
   OrderControllers.createOrder
 );
 
+router.patch(
+  "/change-status/:id",
+  auth(UserRole.VENDOR),
+  validateRequest(OrderValidations.changeOrderStatus),
+  OrderControllers.changeOrderStatus
+);
+
+router.patch(
+  "/change-payment-status/:id",
+  auth(UserRole.VENDOR),
+  validateRequest(OrderValidations.changePaymentStatus),
+  OrderControllers.changePaymentStatus
+);
+
 export const OrderRoutes = router;

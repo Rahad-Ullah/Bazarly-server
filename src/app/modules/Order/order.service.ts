@@ -1,4 +1,4 @@
-import { Order } from "@prisma/client";
+import { Order, OrderPaymentStatus, OrderStatus } from "@prisma/client";
 import { TAuthUser } from "../../interface/common";
 import prisma from "../../shared/prisma";
 import ApiError from "../../errors/ApiError";
@@ -34,8 +34,58 @@ const createOrderIntoDB = async (user: TAuthUser, payload: Order) => {
   return result;
 };
 
+// ********--- change order status ---********
+const changeOrderStatusIntoDB = async (
+  id: string,
+  payload: { status: OrderStatus }
+) => {
+  // check if the order is valid
+  const orderData = await prisma.order.findUnique({
+    where: {
+      id,
+    },
+  });
+  if (!orderData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Order does not exist");
+  }
 
+  const result = await prisma.order.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+
+  return result;
+};
+
+// ********--- change payment status ---********
+const changePaymentStatusIntoDB = async (
+  id: string,
+  payload: { paymentStatus: OrderPaymentStatus }
+) => {
+  // check if the order is valid
+  const orderData = await prisma.order.findUnique({
+    where: {
+      id,
+    },
+  });
+  if (!orderData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Order does not exist");
+  }
+
+  const result = await prisma.order.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+
+  return result;
+};
 
 export const OrderServices = {
   createOrderIntoDB,
+  changeOrderStatusIntoDB,
+  changePaymentStatusIntoDB,
 };
