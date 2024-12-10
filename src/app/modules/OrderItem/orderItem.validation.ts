@@ -1,8 +1,8 @@
 import { z } from "zod";
-const orderItemSchema = z.object({
+export const orderItemSchema = z.object({
   orderId: z
     .string()
-    .min(36, { message: "orderId must be at least 36 characters" }),
+    .min(36, { message: "orderId must be at least 36 characters" }).optional(),
   productId: z
     .string()
     .min(36, { message: "productId must be at least 36 characters" }),

@@ -1,4 +1,10 @@
-import { Order, OrderPaymentStatus, OrderStatus, Prisma } from "@prisma/client";
+import {
+  Order,
+  OrderItem,
+  OrderPaymentStatus,
+  OrderStatus,
+  Prisma,
+} from "@prisma/client";
 import { TAuthUser } from "../../interface/common";
 import prisma from "../../shared/prisma";
 import ApiError from "../../errors/ApiError";
@@ -9,7 +15,11 @@ import { calculatePagination } from "../../utils/pagination";
 import { orderSearchableFields } from "./order.constant";
 
 // ********--- create order ---********
-const createOrderIntoDB = async (user: TAuthUser, payload: Order) => {
+const createOrderIntoDB = async (
+  user: TAuthUser,
+  orderData: Order,
+  products: OrderItem[]
+) => {
   // check if user is valid
   const customerData = await prisma.customer.findFirstOrThrow({
     where: {
@@ -22,7 +32,7 @@ const createOrderIntoDB = async (user: TAuthUser, payload: Order) => {
   // check if shop is valid
   const shopData = await prisma.shop.findUnique({
     where: {
-      id: payload.shopId,
+      id: orderData.shopId,
     },
   });
   if (!shopData) {
@@ -30,10 +40,38 @@ const createOrderIntoDB = async (user: TAuthUser, payload: Order) => {
   }
 
   // set shopId to order data
-  payload.customerId = customerData.id;
+  orderData.customerId = customerData.id;
 
-  const result = await prisma.order.create({
-    data: payload,
+  // check if the product id is valid
+  for (const item of products) {
+    const productData = await prisma.product.findUnique({
+      where: {
+        id: item?.productId,
+      },
+    });
+    if (!productData) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Product is not found");
+    }
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    // create order
+    const orderCreatedData = await tx.order.create({
+      data: orderData,
+    });
+
+    // format order items with order ID
+    const itemsWithOrderId = products.map((item) => ({
+      ...item,
+      orderId: orderCreatedData.id,
+    }));
+
+    // create in the order item table
+    await tx.orderItem.createMany({
+      data: itemsWithOrderId,
+    });
+
+    return orderCreatedData;
   });
 
   return result;

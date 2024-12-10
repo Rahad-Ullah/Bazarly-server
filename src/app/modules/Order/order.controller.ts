@@ -11,9 +11,11 @@ import { paginationOptions } from "../../utils/pagination";
 // create a new order
 const createOrder = catchAsync(
   async (req: Request & { user?: TAuthUser }, res) => {
+    const { products, ...orderData } = req.body;
     const result = await OrderServices.createOrderIntoDB(
       req.user as TAuthUser,
-      req.body
+      orderData,
+      products
     );
 
     sendResponse(res, {
