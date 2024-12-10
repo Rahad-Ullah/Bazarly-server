@@ -226,7 +226,7 @@ const getAllProductsFromDB = async (
   };
 };
 
-// *********--- retrieve all products ---*********
+// *********--- delete product ---*********
 const deleteProductFromDB = async (user: TAuthUser, id: string) => {
   // check if the product is exists
   const productData = await prisma.product.findUnique({

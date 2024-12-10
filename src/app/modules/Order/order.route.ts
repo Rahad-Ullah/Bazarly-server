@@ -8,7 +8,13 @@ import { OrderValidations } from "./order.validation";
 const router = express.Router();
 
 router.get(
-  "/:id",
+  "/",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  OrderControllers.getAllOrders
+);
+
+router.get(
+  "/get-single-order/:id",
   auth(
     UserRole.CUSTOMER,
     UserRole.VENDOR,
@@ -18,7 +24,13 @@ router.get(
   OrderControllers.getSingleOrder
 );
 
-// router.get("/", auth(UserRole.CUSTOMER, UserRole.), OrderControllers.getSingleOrder);
+router.get("/my-orders", auth(UserRole.CUSTOMER), OrderControllers.getMyOrders);
+
+router.get(
+  "/shop-orders",
+  auth(UserRole.VENDOR),
+  OrderControllers.getShopOrders
+);
 
 router.post(
   "/create",
