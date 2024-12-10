@@ -179,7 +179,7 @@ model OrderItem {
   productId String
   quantity  Int
   price     Float
-  discount  Float?
+  discount  Float? @default(0)
 
   // Relationships
   order   Order   @relation(fields: [orderId], references: [id])

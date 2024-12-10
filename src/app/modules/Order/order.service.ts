@@ -95,6 +95,9 @@ const getSingleOrderFromDB = async (id: string) => {
     where: {
       id,
     },
+    include: {
+      orderItem: true,
+    },
   });
 
   return result;
@@ -123,6 +126,9 @@ const getMyOrdersFromDB = async (
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
+    },
+    include: {
+      orderItem: true,
     },
   });
 
@@ -193,6 +199,9 @@ const getShopOrdersFromDB = async (
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
+    },
+    include: {
+      orderItem: true,
     },
   });
 
@@ -265,6 +274,9 @@ const getAllOrdersFromDB = async (
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
+    },
+    include: {
+      orderItem: true,
     },
   });
 
