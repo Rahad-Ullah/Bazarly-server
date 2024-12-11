@@ -12,4 +12,10 @@ router.post(
   CouponControllers.createCoupon
 );
 
+router.patch(
+  "/:id",
+  validateRequest(CouponValidations.update),
+  CouponControllers.updateCoupon
+);
+
 export const CouponRoutes = router;

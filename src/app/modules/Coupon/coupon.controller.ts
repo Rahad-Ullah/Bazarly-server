@@ -15,6 +15,19 @@ const createCoupon = catchAsync(async (req, res) => {
   });
 });
 
+// update coupon
+const updateCoupon = catchAsync(async (req, res) => {
+    const result = await CouponServices.updateCouponIntoDB(req.params.id, req.body)
+  
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Coupon updated successfully",
+      data: result,
+    });
+  });
+
 export const CouponControllers = {
   createCoupon,
+  updateCoupon
 };
