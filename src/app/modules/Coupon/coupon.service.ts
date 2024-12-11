@@ -3,6 +3,7 @@ import prisma from "../../shared/prisma";
 import ApiError from "../../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
 
+// ********--- create coupon ---********
 const createCouponIntoDB = async (payload: Coupon) => {
   // check if the coupon is already exist
   const couponData = await prisma.coupon.findUnique({
@@ -41,6 +42,7 @@ const createCouponIntoDB = async (payload: Coupon) => {
   return result;
 };
 
+// ********--- update coupon ---********
 const updateCouponIntoDB = async (id: string, payload: Partial<Coupon>) => {
   // check if the coupon is exists
   const couponData = await prisma.coupon.findUnique({
@@ -82,7 +84,29 @@ const updateCouponIntoDB = async (id: string, payload: Partial<Coupon>) => {
   return result;
 };
 
+// ********--- delete coupon ---********
+const deleteCouponFromDB = async (id: string) => {
+    // check if the coupon is exists
+    const couponData = await prisma.coupon.findUnique({
+        where: {
+        id,
+        },
+    });
+    if (!couponData) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Coupon does not exists");
+    }
+
+    const result = await prisma.coupon.delete({
+        where: {
+            id
+        }
+    })
+
+    return result
+}
+
 export const CouponServices = {
   createCouponIntoDB,
   updateCouponIntoDB,
+  deleteCouponFromDB
 };
