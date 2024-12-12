@@ -7,6 +7,10 @@ import { ReviewValidations } from "./review.validation";
 
 const router = express.Router();
 
+router.get("/product/:id", ReviewControllers.getProductReviews);
+
+router.get("/", ReviewControllers.getAllReviews);
+
 router.post(
   "/create",
   auth(UserRole.CUSTOMER),
