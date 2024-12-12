@@ -5,7 +5,17 @@ import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 
-// router.get('/', )
+router.get(
+  "/",
+  auth(UserRole.CUSTOMER),
+  FollowedShopControllers.getUserFollowedShops
+);
+
+router.get(
+  "/followers/:shopId",
+  auth(UserRole.CUSTOMER),
+  FollowedShopControllers.getShopFollowers
+);
 
 router.post(
   "/follow",

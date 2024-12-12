@@ -2,7 +2,11 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../errors/ApiError";
 import { TAuthUser } from "../../interface/common";
 import prisma from "../../shared/prisma";
-import { FollowedShop } from "@prisma/client";
+import { FollowedShop, Prisma } from "@prisma/client";
+import { IFollowedShopFilterRequest } from "./followedShop.interface";
+import { IPaginationOptions } from "../../interface/pagination";
+import { calculatePagination } from "../../utils/pagination";
+import { followedShopSearchableFields } from "./followedShop.constant";
 
 const followShopIntoDB = async (user: TAuthUser, payload: FollowedShop) => {
   // check if shopId is valid
@@ -88,7 +92,93 @@ const unfollowShopFromDB = async (user: TAuthUser, payload: FollowedShop) => {
   return result;
 };
 
+const getUserFollowedShopsFromDB = async (user: TAuthUser) => {
+  // check if the customer is valid
+  const customerData = await prisma.customer.findUniqueOrThrow({
+    where: {
+      email: user?.email,
+    },
+  });
+
+  const result = await prisma.followedShop.findMany({
+    where: {
+      customerId: customerData.id,
+    },
+  });
+
+  return result;
+};
+
+// **********--- get all customers ---**********
+const getShopFollowersFromDB = async (
+  shopId: string,
+  params: IFollowedShopFilterRequest,
+  options: IPaginationOptions
+) => {
+  // format params and options information
+  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+  const { searchTerm, ...filterData } = params;
+
+  const conditions: Prisma.FollowedShopWhereInput[] = [];
+
+  // filter if search term specified
+  if (searchTerm) {
+    conditions.push({
+      OR: followedShopSearchableFields.map((value) => ({
+        customer: {
+          [value]: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+      })),
+    });
+  }
+  // filter if filter data specified
+  if (Object.keys(filterData).length > 0) {
+    conditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        customer: {
+          [key]: {
+            equals: (filterData as any)[key],
+          },
+        },
+      })),
+    });
+  }
+  // filter by shop
+  conditions.push({
+    shopId,
+  });
+
+  // execute query
+  const result = await prisma.followedShop.findMany({
+    where: { AND: conditions } as Prisma.FollowedShopWhereInput,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+  });
+
+  // count total
+  const total = await prisma.followedShop.count({
+    where: { AND: conditions } as Prisma.FollowedShopWhereInput,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 export const FollowedShopServices = {
   followShopIntoDB,
   unfollowShopFromDB,
+  getUserFollowedShopsFromDB,
+  getShopFollowersFromDB,
 };
