@@ -14,4 +14,13 @@ router.post(
   ReviewControllers.createReview
 );
 
+router.patch(
+  "/:id",
+  auth(UserRole.CUSTOMER),
+  validateRequest(ReviewValidations.update),
+  ReviewControllers.updateReview
+);
+
+router.delete("/:id", auth(UserRole.CUSTOMER), ReviewControllers.deleteReview);
+
 export const ReviewRoutes = router;

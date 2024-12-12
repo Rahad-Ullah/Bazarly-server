@@ -10,6 +10,14 @@ const create = z.object({
   }),
 });
 
+const update = z.object({
+  body: z.object({
+    rating: z.number().optional(),
+    comment: z.string().optional(),
+  }),
+});
+
 export const ReviewValidations = {
   create,
+  update,
 };

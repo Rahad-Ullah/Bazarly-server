@@ -22,6 +22,41 @@ const createReview = catchAsync(
   }
 );
 
+// update review
+const updateReview = catchAsync(
+    async (req: Request & { user?: TAuthUser }, res) => {
+      const result = await ReviewServices.updateReviewIntoDB(
+        req.params.id,
+        req.body
+      );
+  
+      sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Review updated successfully",
+        data: result,
+      });
+    }
+  );
+
+  // delete review
+const deleteReview = catchAsync(
+    async (req: Request & { user?: TAuthUser }, res) => {
+      const result = await ReviewServices.deleteReviewIntoDB(
+        req.params.id
+      );
+  
+      sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Review deleted successfully",
+        data: result,
+      });
+    }
+  );
+
 export const ReviewControllers = {
   createReview,
+  updateReview,
+  deleteReview
 };
