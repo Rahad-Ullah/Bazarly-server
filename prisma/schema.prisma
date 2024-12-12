@@ -66,6 +66,7 @@ model Customer {
   review              Review[]
   followedShop        FollowedShop[]
   recentViewedProduct RecentViewedProduct[]
+  customerCoupon      CustomerCoupon[]
 
   @@map("customers")
 }
@@ -223,18 +224,30 @@ model FlashSale {
 }
 
 model Coupon {
-  id             String   @id @default(uuid())
-  code           String   @unique
-  discountAmount Float
-  startTime      DateTime
-  endTime        DateTime
-  usageLimit     Int
-  usedCount      Int      @default(0)
-  isDeleted      Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String           @id @default(uuid())
+  code            String           @unique
+  discountAmount  Float
+  startTime       DateTime
+  endTime         DateTime
+  usageLimit      Int
+  totalUsageLimit Int?
+  usedCount       Int              @default(0)
+  isDeleted       Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  customerCoupon  CustomerCoupon[]
 
   @@map("coupons")
+}
+
+model CustomerCoupon {
+  id         String @id @default(uuid())
+  customerId String
+  couponId   String
+
+  // Relationships
+  customer Customer @relation(fields: [customerId], references: [id])
+  coupon   Coupon   @relation(fields: [couponId], references: [id])
 }
 
 model FollowedShop {

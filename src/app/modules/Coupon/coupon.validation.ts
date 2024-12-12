@@ -22,7 +22,14 @@ const update = z.object({
   }),
 });
 
+const applyCoupon = z.object({
+  body: z.object({
+    code: z.string().min(1, { message: "Coupon is required" }),
+  }),
+});
+
 export const CouponValidations = {
   create,
   update,
+  applyCoupon,
 };
