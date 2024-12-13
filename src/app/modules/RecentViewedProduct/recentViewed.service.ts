@@ -4,6 +4,7 @@ import { TAuthUser } from "../../interface/common";
 import prisma from "../../shared/prisma";
 import { RecentViewedProduct } from "@prisma/client";
 
+// *******--- add to viewed products ---*******
 const createRecentViewedProductIntoDB = async (
   user: TAuthUser,
   payload: RecentViewedProduct
@@ -48,6 +49,54 @@ const createRecentViewedProductIntoDB = async (
   return result;
 };
 
+// *******--- get recent viewed products ---*******
+const getRecentViewedProductsFromDB = async (user: TAuthUser) => {
+  // check if the customer is valid
+  const customerData = await prisma.customer.findUnique({
+    where: {
+      email: user?.email,
+    },
+  });
+  if (!customerData) {
+    throw new ApiError(StatusCodes.UNAUTHORIZED, "You are not authorized");
+  }
+
+  const result = await prisma.recentViewedProduct.findMany({
+    where: {
+      customerId: customerData.id,
+    },
+    orderBy: {
+      viewedAt: "desc",
+    },
+    take: 10,
+  });
+
+  return result;
+};
+
+// *******--- remove from recent viewed products ---*******
+const removeRecentViewedProductFromDB = async (id: string) => {
+    // check if the item is added
+    const isAdded = await prisma.recentViewedProduct.findUnique({
+        where: {
+            id
+        },
+    });
+    if (!isAdded) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Item not added");
+    }
+
+    const result = await prisma.recentViewedProduct.delete({
+        where: {
+            id
+        }
+    })
+
+    return result
+}
+
 export const RecentViewedServices = {
   createRecentViewedProductIntoDB,
+  getRecentViewedProductsFromDB,
+  removeRecentViewedProductFromDB
 };

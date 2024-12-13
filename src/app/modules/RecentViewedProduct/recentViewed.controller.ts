@@ -22,6 +22,40 @@ const createRecentViewedProduct = catchAsync(
   }
 );
 
+// get recent viewed items
+const getRecentViewedProduct = catchAsync(
+    async (req: Request & { user?: TAuthUser }, res) => {
+      const result = await RecentViewedServices.getRecentViewedProductsFromDB(
+        req.user as TAuthUser
+      );
+  
+      sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Retrieved recent viewed products successfully",
+        data: result,
+      });
+    }
+  );
+
+  // remove recent viewed items
+const removeRecentViewedProduct = catchAsync(
+    async (req: Request & { user?: TAuthUser }, res) => {
+      const result = await RecentViewedServices.removeRecentViewedProductFromDB(
+        req.params.id
+      );
+  
+      sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Removed from recent viewed products successfully",
+        data: result,
+      });
+    }
+  );
+
 export const RecentViewedControllers = {
   createRecentViewedProduct,
+  getRecentViewedProduct,
+  removeRecentViewedProduct
 };
