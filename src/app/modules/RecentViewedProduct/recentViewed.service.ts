@@ -2,11 +2,10 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../errors/ApiError";
 import { TAuthUser } from "../../interface/common";
 import prisma from "../../shared/prisma";
-import { RecentViewedProduct } from "@prisma/client";
 
 // *******--- add to viewed products ---*******
 const createRecentViewedProductIntoDB = async (
-  user: TAuthUser,
+  userEmail: string,
   payload: { productId: string }
 ) => {
   // check if product id is valid
@@ -22,11 +21,11 @@ const createRecentViewedProductIntoDB = async (
   // check if the customer is valid
   const customerData = await prisma.customer.findUnique({
     where: {
-      email: user?.email,
+      email: userEmail,
     },
   });
   if (!customerData) {
-    throw new ApiError(StatusCodes.UNAUTHORIZED, "You are not authorized");
+    return "Customer not found";
   }
 
   // check if the product is already added to recent view

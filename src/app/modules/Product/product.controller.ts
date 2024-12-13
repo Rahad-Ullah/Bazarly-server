@@ -58,9 +58,9 @@ const getSingleProduct = catchAsync(
     const result = await ProductServices.getSingleProductFromDB(req.params.id);
 
     // add to recent viewed products
-    if (req.user?.role === "CUSTOMER") {
+    if (req.query.userEmail) {
       await RecentViewedServices.createRecentViewedProductIntoDB(
-        req.user as TAuthUser,
+        req.query.userEmail as string,
         {
           productId: req.params.id,
         }
