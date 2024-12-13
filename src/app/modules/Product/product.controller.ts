@@ -77,19 +77,24 @@ const getSingleProduct = catchAsync(
 );
 
 // get all products
-const getAllProducts = catchAsync(async (req, res) => {
-  const filters = pick(req.query, productFilterableFields);
-  const options = pick(req.query, paginationOptions);
-  const result = await ProductServices.getAllProductsFromDB(filters, options);
+const getAllProducts = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res) => {
+    const filters = pick(req.query, productFilterableFields);
+    const options = pick(req.query, paginationOptions);
+    const result = await ProductServices.getAllProductsFromDB(
+      filters,
+      options,
+    );
 
-  sendResponse(res, {
-    statusCode: StatusCodes.OK,
-    success: true,
-    message: "Products retrieved successfully",
-    meta: result.meta,
-    data: result.data,
-  });
-});
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Products retrieved successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
 
 // get all products
 const deleteProduct = catchAsync(async (req: Request & {user?: TAuthUser}, res) => {

@@ -6,6 +6,7 @@ export const productFilterableFields = [
   "searchTerm",
   "category",
   "shopId",
+  "userEmail",
 ];
 
 export const productSearchableFields = ["name", "description"];

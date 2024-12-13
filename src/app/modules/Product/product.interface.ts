@@ -5,5 +5,6 @@ export interface IProductFilterRequest {
   maxPrice?: string | undefined;
   category?: string | undefined;
   shopId?: string | undefined;
+  userEmail?: string | undefined;
   searchTerm?: string | undefined;
 }

@@ -120,8 +120,15 @@ const getAllProductsFromDB = async (
 ) => {
   // format params and options information
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
-  const { searchTerm, category, minPrice, maxPrice, shopId, ...filterData } =
-    params;
+  const {
+    searchTerm,
+    category,
+    minPrice,
+    maxPrice,
+    shopId,
+    userEmail,
+    ...filterData
+  } = params;
 
   const conditions: Prisma.ProductWhereInput[] = [];
 
@@ -201,6 +208,26 @@ const getAllProductsFromDB = async (
     isDeleted: false,
   });
 
+  // get the customer data
+  const customerData = userEmail
+    ? await prisma.customer.findUnique({
+        where: {
+          email: userEmail,
+        },
+      })
+    : null;
+
+  // Retrieve followed shops for prioritization if user is logged in
+  let followedShopIds: string[] = [];
+  if (customerData) {
+    followedShopIds = await prisma.followedShop
+      .findMany({
+        where: { customerId: customerData.id },
+        select: { shopId: true },
+      })
+      .then((shops) => shops.map((shop) => shop.shopId));
+  }
+
   // execute query
   const result = await prisma.product.findMany({
     where: { AND: conditions } as Prisma.ProductWhereInput,
@@ -209,6 +236,16 @@ const getAllProductsFromDB = async (
     orderBy: {
       [sortBy]: sortOrder,
     },
+  });
+
+  // Prioritize followed shops in JavaScript
+  const prioritizedProducts = result.sort((a, b) => {
+    const aIsFollowed = followedShopIds.includes(a.shopId);
+    const bIsFollowed = followedShopIds.includes(b.shopId);
+
+    if (aIsFollowed && !bIsFollowed) return -1; // a comes first
+    if (!aIsFollowed && bIsFollowed) return 1; // b comes first
+    return 0; // no change
   });
 
   // count total
@@ -222,7 +259,7 @@ const getAllProductsFromDB = async (
       limit,
       total,
     },
-    data: result,
+    data: prioritizedProducts,
   };
 };
 
