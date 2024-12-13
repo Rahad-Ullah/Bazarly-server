@@ -268,7 +268,7 @@ model RecentViewedProduct {
   id         String   @id @default(uuid())
   customerId String
   productId  String
-  viewedAt   DateTime
+  viewedAt   DateTime @default(now())
 
   // Relationships
   customer Customer @relation(fields: [customerId], references: [id])
