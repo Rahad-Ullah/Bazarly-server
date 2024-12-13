@@ -7,7 +7,7 @@ import { RecentViewedProduct } from "@prisma/client";
 // *******--- add to viewed products ---*******
 const createRecentViewedProductIntoDB = async (
   user: TAuthUser,
-  payload: RecentViewedProduct
+  payload: { productId: string }
 ) => {
   // check if product id is valid
   const productData = await prisma.product.findUnique({
@@ -28,8 +28,6 @@ const createRecentViewedProductIntoDB = async (
   if (!customerData) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "You are not authorized");
   }
-  // insert the customer id to the payload
-  payload.customerId = customerData?.id;
 
   // check if the product is already added to recent view
   const isAdded = await prisma.recentViewedProduct.findFirst({
@@ -39,11 +37,14 @@ const createRecentViewedProductIntoDB = async (
     },
   });
   if (isAdded) {
-    throw new ApiError(StatusCodes.CONFLICT, "Product already added");
+    return "Product already added";
   }
 
   const result = await prisma.recentViewedProduct.create({
-    data: payload,
+    data: {
+      customerId: customerData.id,
+      productId: productData.id,
+    },
   });
 
   return result;

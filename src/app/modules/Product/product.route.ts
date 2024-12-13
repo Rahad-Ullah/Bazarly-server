@@ -32,7 +32,16 @@ router.patch(
   }
 );
 
-router.get("/:id", ProductControllers.getSingleProduct);
+router.get(
+  "/:id",
+  auth(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.VENDOR,
+    UserRole.CUSTOMER
+  ),
+  ProductControllers.getSingleProduct
+);
 
 router.get("/", ProductControllers.getAllProducts);
 

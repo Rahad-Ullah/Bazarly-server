@@ -7,6 +7,7 @@ import { TAuthUser } from "../../interface/common";
 import pick from "../../utils/pick";
 import { productFilterableFields } from "./product.constant";
 import { paginationOptions } from "../../utils/pagination";
+import { RecentViewedServices } from "../RecentViewedProduct/recentViewed.service";
 
 // create a new product
 const createProduct = catchAsync(
@@ -28,7 +29,7 @@ const createProduct = catchAsync(
 // duplicate product
 const duplicateProduct = catchAsync(
   async (req: Request & { user?: TAuthUser }, res) => {
-    const result = await ProductServices.duplicateProductIntoDB(req.body)
+    const result = await ProductServices.duplicateProductIntoDB(req.body);
 
     sendResponse(res, {
       statusCode: StatusCodes.OK,
@@ -52,16 +53,28 @@ const updateProduct = catchAsync(async (req, res) => {
 });
 
 // get single product
-const getSingleProduct = catchAsync(async (req, res) => {
-  const result = await ProductServices.getSingleProductFromDB(req.params.id);
+const getSingleProduct = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res) => {
+    const result = await ProductServices.getSingleProductFromDB(req.params.id);
 
-  sendResponse(res, {
-    statusCode: StatusCodes.OK,
-    success: true,
-    message: "Product retrieved successfully",
-    data: result,
-  });
-});
+    // add to recent viewed products
+    if (req.user?.role === "CUSTOMER") {
+      await RecentViewedServices.createRecentViewedProductIntoDB(
+        req.user as TAuthUser,
+        {
+          productId: req.params.id,
+        }
+      );
+    }
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Product retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 // get all products
 const getAllProducts = catchAsync(async (req, res) => {
