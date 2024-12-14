@@ -9,7 +9,7 @@ import { TAuthUser } from "../../interface/common";
 const createRecentViewedProduct = catchAsync(
   async (req: Request & { user?: TAuthUser }, res) => {
     const result = await RecentViewedServices.createRecentViewedProductIntoDB(
-      req.user as TAuthUser,
+      req.params.userEmail,
       req.body
     );
 

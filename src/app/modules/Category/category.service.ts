@@ -6,21 +6,31 @@ import { ICategoryFilterRequest } from "./category.interface";
 import { IPaginationOptions } from "../../interface/pagination";
 import { calculatePagination } from "../../utils/pagination";
 import { categorySearchableFields } from "./category.constant";
+import { Request } from "express";
+import { IUploadedFile } from "../../interface/file";
+import { fileUploader } from "../../utils/fileUploader";
 
 // *********--- create category ---*********
-const createCategoryIntoDB = async (payload: Category) => {
+const createCategoryIntoDB = async (req: Request) => {
   // check if the category is already exists
   const categoryData = await prisma.category.findFirst({
     where: {
-      name: payload.name,
+      name: req.body.name,
     },
   });
   if (categoryData) {
     throw new ApiError(StatusCodes.CONFLICT, "Category already exists");
   }
 
+  // upload photo to cloudinary
+  const file = req.file as IUploadedFile;
+  if (file) {
+    const uploadedFile = await fileUploader.uploadToCloudinary(file);
+    req.body.image = uploadedFile?.secure_url;
+  }
+
   const result = await prisma.category.create({
-    data: payload,
+    data: req.body,
   });
 
   return result;
@@ -101,23 +111,30 @@ const getSingleCategoryFromDB = async (id: string) => {
 };
 
 // *********--- update category ---*********
-const updateCategoryIntoDB = async (id: string, payload: Partial<Category>) => {
+const updateCategoryIntoDB = async (id: string, req: Request) => {
   // check if category exists
   const categoryData = await prisma.category.findUnique({
     where: {
-      id
-    }
-  })
-  if(!categoryData) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Category does not exist")
+      id,
+    },
+  });
+  if (!categoryData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Category does not exist");
   }
-  
+
+  // upload photo to cloudinary
+  const file = req.file as IUploadedFile;
+  if (file) {
+    const uploadedFile = await fileUploader.uploadToCloudinary(file);
+    req.body.image = uploadedFile?.secure_url;
+  }
+
   const result = await prisma.category.update({
     where: {
-      id
+      id,
     },
-    data: payload
-  })
+    data: req.body,
+  });
 
   return result;
 };

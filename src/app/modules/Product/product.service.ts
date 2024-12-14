@@ -29,7 +29,7 @@ const createProductIntoDB = async (user: TAuthUser, req: Request) => {
   req.body.shopId = shopData.id;
 
   // check if the categoryId is valid
-  await prisma.category.findUnique({
+  await prisma.category.findUniqueOrThrow({
     where: {
       id: req.body.categoryId,
     },
