@@ -123,9 +123,27 @@ const cancelPaymentIntoDB = async (paymentId: string, orderId: string) => {
   return result;
 };
 
+const getSinglePayment = async (id: string) => {
+  const result = await prisma.payment.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      order: {
+        include: {
+          customer: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 export const PaymentServices = {
   createPaymentIntoDB,
   successPaymentIntoDB,
   cancelPaymentIntoDB,
   failPaymentIntoDB,
+  getSinglePayment,
 };

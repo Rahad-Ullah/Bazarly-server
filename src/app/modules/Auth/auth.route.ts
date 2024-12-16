@@ -4,6 +4,8 @@ import validateRequest from "../../middlewares/validateRequest";
 import { AuthValidations } from "./auth.validation";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
+import { UserValidations } from "../User/user.validation";
+import { UserControllers } from "../User/user.controller";
 
 const router = express.Router();
 
@@ -11,6 +13,12 @@ router.post(
   "/login",
   validateRequest(AuthValidations.login),
   AuthControllers.login
+);
+
+router.post(
+  "/sign-up",
+  validateRequest(UserValidations.createCustomer),
+  UserControllers.createCustomer
 );
 
 router.post("/refresh-token", AuthControllers.refreshToken);

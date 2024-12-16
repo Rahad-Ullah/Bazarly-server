@@ -70,6 +70,20 @@ const getProductReviews = catchAsync(
   }
 );
 
+// get shop reviews
+const getShopReviews = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res) => {
+    const result = await ReviewServices.getShopReviews(req.params.id);
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Reviews retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 // get product reviews
 const getAllReviews = catchAsync(
   async (req: Request & { user?: TAuthUser }, res) => {
@@ -91,5 +105,6 @@ export const ReviewControllers = {
   updateReview,
   deleteReview,
   getProductReviews,
+  getShopReviews,
   getAllReviews,
 };

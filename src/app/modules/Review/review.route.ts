@@ -9,6 +9,8 @@ const router = express.Router();
 
 router.get("/product/:id", ReviewControllers.getProductReviews);
 
+router.get("/shop/:id", ReviewControllers.getShopReviews);
+
 router.get("/", ReviewControllers.getAllReviews);
 
 router.post(

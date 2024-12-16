@@ -61,9 +61,14 @@ const loginIntoDB = async (payload: ILogin) => {
   );
 
   return {
+    user: {
+      email: userData.email,
+      role: userData.role,
+      status: userData.status,
+      needPasswordChange: userData.needPasswordChange,
+    },
     accessToken,
     refreshToken,
-    needPasswordChange: userData.needPasswordChange,
   };
 };
 

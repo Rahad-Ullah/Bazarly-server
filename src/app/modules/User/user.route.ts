@@ -28,14 +28,12 @@ router.post(
 
 router.post(
   "/create-vendor",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   validateRequest(UserValidations.createVendor),
   UserControllers.createVendor
 );
 
 router.post(
   "/create-customer",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   validateRequest(UserValidations.createCustomer),
   UserControllers.createCustomer
 );

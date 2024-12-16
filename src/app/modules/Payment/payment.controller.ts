@@ -12,9 +12,6 @@ const createPayment = catchAsync(
       req.user as TAuthUser,
       req.body
     );
-    if (result?.redirect_url) {
-      res.redirect(result.redirect_url);
-    }
 
     sendResponse(res, {
       statusCode: StatusCodes.OK,
@@ -67,6 +64,7 @@ const failPayment = catchAsync(
     });
   }
 );
+
 const cancelPayment = catchAsync(
   async (req: Request & { user?: TAuthUser }, res) => {
     const result = await PaymentServices.cancelPaymentIntoDB(
@@ -89,9 +87,23 @@ const cancelPayment = catchAsync(
   }
 );
 
+const getSinglePayment = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res) => {
+    const result = await PaymentServices.getSinglePayment(req.params.id);
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Payment retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 export const PaymentControllers = {
   createPayment,
   successPayment,
   failPayment,
   cancelPayment,
+  getSinglePayment,
 };

@@ -18,7 +18,12 @@ router.get(
 // get single shop by shopId
 router.get(
   "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.VENDOR),
+  auth(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.VENDOR,
+    UserRole?.CUSTOMER
+  ),
   ShopControllers.getSingleShop
 );
 

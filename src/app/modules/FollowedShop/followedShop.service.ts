@@ -104,6 +104,9 @@ const getUserFollowedShopsFromDB = async (user: TAuthUser) => {
     where: {
       customerId: customerData.id,
     },
+    include: {
+      shop: true,
+    },
   });
 
   return result;
@@ -158,6 +161,9 @@ const getShopFollowersFromDB = async (
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
+    },
+    include: {
+      customer: true,
     },
   });
 

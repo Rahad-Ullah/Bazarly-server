@@ -72,7 +72,7 @@ const deleteReviewIntoDB = async (id: string) => {
   return result;
 };
 
-// *******--- get review ---*******
+// *******--- get product review ---*******
 const getProductReviews = async (id: string) => {
   // check if the product ID is valid
   const productData = await prisma.product.findUnique({
@@ -84,7 +84,7 @@ const getProductReviews = async (id: string) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Product does not found");
   }
 
-  const result = await prisma.review.findMany({
+  const reviews = await prisma.review.findMany({
     where: {
       productId: id,
       isDeleted: false,
@@ -94,10 +94,65 @@ const getProductReviews = async (id: string) => {
     },
   });
 
-  return result;
+  const avgRating = await prisma.review.aggregate({
+    where: {
+      productId: id,
+      isDeleted: false,
+    },
+    _avg: {
+      rating: true,
+    },
+  });
+
+  return {
+    reviews,
+    rating: avgRating._avg.rating || 0,
+  };
 };
 
-// *********--- retrieve shop reviews ---*********
+// *******--- get review ---*******
+const getShopReviews = async (id: string) => {
+  // check if the shop ID is valid
+  const shopData = await prisma.shop.findUnique({
+    where: {
+      id,
+    },
+  });
+  if (!shopData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Shop does not found");
+  }
+
+  const reviews = await prisma.review.findMany({
+    where: {
+      product: {
+        shopId: shopData.id
+      },
+      isDeleted: false,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const avgRating = await prisma.review.aggregate({
+    where: {
+      product: {
+        shopId: shopData.id
+      },
+      isDeleted: false,
+    },
+    _avg: {
+      rating: true,
+    },
+  });
+
+  return {
+    reviews,
+    rating: avgRating._avg.rating || 0,
+  };
+};
+
+// *********--- retrieve all reviews ---*********
 const getAllReviewsFromDB = async (
   params: IReviewFilterRequest,
   options: IPaginationOptions
@@ -191,5 +246,6 @@ export const ReviewServices = {
   updateReviewIntoDB,
   deleteReviewIntoDB,
   getProductReviews,
+  getShopReviews,
   getAllReviewsFromDB,
 };

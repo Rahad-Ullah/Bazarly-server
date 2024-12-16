@@ -108,6 +108,16 @@ const getSingleProductFromDB = async (id: string) => {
     where: {
       id,
     },
+    include: {
+      category: true,
+      shop: true,
+      _count: true,
+      review: {
+        include: {
+          customer: true,
+        },
+      },
+    },
   });
 
   return result;
@@ -235,6 +245,9 @@ const getAllProductsFromDB = async (
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
+    },
+    include: {
+      _count: true,
     },
   });
 
