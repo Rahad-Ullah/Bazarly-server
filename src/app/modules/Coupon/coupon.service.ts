@@ -210,10 +210,13 @@ const applyCouponIntoDB = async (
   const couponData = await prisma.coupon.findUnique({
     where: {
       code: payload.code,
+      endTime: {
+        gte: new Date(),
+      },
     },
   });
   if (!couponData) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Coupon not found");
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Coupon Code");
   }
 
   // check if user already used the coupon

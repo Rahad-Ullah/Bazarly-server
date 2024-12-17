@@ -247,6 +247,7 @@ const getAllProductsFromDB = async (
       [sortBy]: sortOrder,
     },
     include: {
+      category: true,
       _count: true,
     },
   });

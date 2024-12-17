@@ -18,20 +18,20 @@ const createRecentViewedProductIntoDB = async (
     throw new ApiError(StatusCodes.NOT_FOUND, "Product not found");
   }
 
-  // check if the customer is valid
-  const customerData = await prisma.customer.findUnique({
+  // check if the user is valid
+  const userData = await prisma.user.findUnique({
     where: {
       email: userEmail,
     },
   });
-  if (!customerData) {
+  if (!userData) {
     return "Customer not found";
   }
 
   // check if the product is already added to recent view
   const isAdded = await prisma.recentViewedProduct.findFirst({
     where: {
-      customerId: customerData.id,
+      userId: userData.id,
       productId: productData.id,
     },
   });
@@ -41,7 +41,7 @@ const createRecentViewedProductIntoDB = async (
 
   const result = await prisma.recentViewedProduct.create({
     data: {
-      customerId: customerData.id,
+      userId: userData.id,
       productId: productData.id,
     },
   });
@@ -52,23 +52,26 @@ const createRecentViewedProductIntoDB = async (
 // *******--- get recent viewed products ---*******
 const getRecentViewedProductsFromDB = async (user: TAuthUser) => {
   // check if the customer is valid
-  const customerData = await prisma.customer.findUnique({
+  const userData = await prisma.user.findUnique({
     where: {
       email: user?.email,
     },
   });
-  if (!customerData) {
+  if (!userData) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "You are not authorized");
   }
 
   const result = await prisma.recentViewedProduct.findMany({
     where: {
-      customerId: customerData.id,
+      userId: userData.id,
     },
     orderBy: {
       viewedAt: "desc",
     },
     take: 10,
+    select: {
+      product: true,
+    },
   });
 
   return result;

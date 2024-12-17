@@ -24,9 +24,10 @@ model User {
   updatedAt          DateTime   @updatedAt
 
   // Relationships
-  admin    Admin?
-  customer Customer?
-  vendor   Vendor?
+  admin               Admin?
+  customer            Customer?
+  vendor              Vendor?
+  RecentViewedProduct RecentViewedProduct[]
 
   @@map("users")
 }
@@ -61,12 +62,11 @@ model Customer {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  user                User                  @relation(fields: [email], references: [email])
-  order               Order[]
-  review              Review[]
-  followedShop        FollowedShop[]
-  recentViewedProduct RecentViewedProduct[]
-  customerCoupon      CustomerCoupon[]
+  user           User             @relation(fields: [email], references: [email])
+  order          Order[]
+  review         Review[]
+  followedShop   FollowedShop[]
+  customerCoupon CustomerCoupon[]
 
   @@map("customers")
 }
@@ -266,14 +266,14 @@ model FollowedShop {
 }
 
 model RecentViewedProduct {
-  id         String   @id @default(uuid())
-  customerId String
-  productId  String
-  viewedAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  viewedAt  DateTime @default(now())
 
   // Relationships
-  customer Customer @relation(fields: [customerId], references: [id])
-  product  Product  @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 
   @@map("recent_viewed_products")
 }

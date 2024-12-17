@@ -52,6 +52,16 @@ const getAllCustomersFromDB = async (
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          status: true,
+          role: true,
+        },
+      },
+    },
   });
 
   // count total

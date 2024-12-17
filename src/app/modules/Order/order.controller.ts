@@ -71,6 +71,18 @@ const getSingleOrder = catchAsync(async (req, res) => {
   });
 });
 
+// get orders by product id
+const getProductOrder = catchAsync(async (req: Request & {user?: TAuthUser}, res) => {
+  const result = await OrderServices.getProductOrderFromDB(req.user as TAuthUser, req.params.id);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Order retrieved successfully",
+    data: result,
+  });
+});
+
 // get my orders
 const getMyOrders = catchAsync(
   async (req: Request & { user?: TAuthUser }, res) => {
@@ -132,6 +144,7 @@ export const OrderControllers = {
   changeOrderStatus,
   changePaymentStatus,
   getSingleOrder,
+  getProductOrder,
   getMyOrders,
   getShopOrders,
   getAllOrders

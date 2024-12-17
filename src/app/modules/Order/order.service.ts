@@ -4,6 +4,7 @@ import {
   OrderPaymentStatus,
   OrderStatus,
   Prisma,
+  ProductStatus,
 } from "@prisma/client";
 import { TAuthUser } from "../../interface/common";
 import prisma from "../../shared/prisma";
@@ -141,6 +142,41 @@ const getSingleOrderFromDB = async (id: string) => {
   return result;
 };
 
+// ********--- get single order ---********
+const getProductOrderFromDB = async (user: TAuthUser, id: string) => {
+  // check the customer
+  const customerData = await prisma.customer.findUnique({
+    where: {
+      email: user?.email,
+    },
+  });
+
+  const productData = await prisma.product.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+      status: ProductStatus.ACTIVE,
+    },
+  });
+  if (!productData) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Product does not exits");
+  }
+
+  const result = await prisma.order.findMany({
+    where: {
+      customerId: customerData?.id,
+      orderItem: {
+        some: {
+          productId: productData.id,
+        },
+      },
+      paymentStatus: OrderPaymentStatus.PAID,
+    },
+  });
+
+  return result;
+};
+
 // ********--- get my orders ---********
 const getMyOrdersFromDB = async (
   user: TAuthUser,
@@ -166,7 +202,11 @@ const getMyOrdersFromDB = async (
       [sortBy]: sortOrder,
     },
     include: {
-      orderItem: true,
+      orderItem: {
+        include: {
+          product: true,
+        },
+      },
     },
   });
 
@@ -338,6 +378,7 @@ export const OrderServices = {
   changeOrderStatusIntoDB,
   changePaymentStatusIntoDB,
   getSingleOrderFromDB,
+  getProductOrderFromDB,
   getMyOrdersFromDB,
   getShopOrdersFromDB,
   getAllOrdersFromDB,

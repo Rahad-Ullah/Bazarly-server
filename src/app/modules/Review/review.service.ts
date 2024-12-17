@@ -92,6 +92,9 @@ const getProductReviews = async (id: string) => {
     orderBy: {
       createdAt: "desc",
     },
+    include: {
+      customer: true,
+    },
   });
 
   const avgRating = await prisma.review.aggregate({

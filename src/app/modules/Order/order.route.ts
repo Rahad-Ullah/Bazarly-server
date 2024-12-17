@@ -24,6 +24,15 @@ router.get(
   OrderControllers.getSingleOrder
 );
 
+// get orders by product id
+router.get(
+  "/get-product-order/:id",
+  auth(
+    UserRole.CUSTOMER,
+  ),
+  OrderControllers.getProductOrder
+);
+
 router.get("/my-orders", auth(UserRole.CUSTOMER), OrderControllers.getMyOrders);
 
 router.get(

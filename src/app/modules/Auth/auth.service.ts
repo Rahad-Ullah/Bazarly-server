@@ -171,7 +171,7 @@ const forgotPassword = async (payload: { email: string }) => {
     config.jwt.reset_pass_expires_in as string
   );
   // generate reset link for sending by email
-  const resetPassLink = `${config.reset_pass_link}?id=${userData.id}&token=${resetPassToken}`;
+  const resetPassLink = `${config.site_url.client_url}/reset-password?id=${userData.id}&token=${resetPassToken}`;
 
   // send email
   await emailSender(
@@ -184,6 +184,7 @@ const forgotPassword = async (payload: { email: string }) => {
             <button>Reset Password</button>
           </a>
         </p>
+        <p><strong>Note:</strong>This link expired after 5 minutes!</p>
       </div>
       `
   );
