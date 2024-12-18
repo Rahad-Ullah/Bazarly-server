@@ -9,11 +9,19 @@ import { IUploadedFile } from "../../interface/file";
 import { fileUploader } from "../../utils/fileUploader";
 
 // ********---create admin ---*******
-const createAdminIntoDB = async (req: Request) => {
+const createAdminIntoDB = async (payload: {
+  password: string;
+  role?: string;
+  data: {
+    name: string;
+    email: string;
+    phoneNumber: string;
+  };
+}) => {
   // check if the user is already exists
   const isUserExists = await prisma.user.findUnique({
     where: {
-      email: req.body.data.email,
+      email: payload.data.email,
     },
   });
   if (isUserExists) {
@@ -21,13 +29,16 @@ const createAdminIntoDB = async (req: Request) => {
   }
 
   // hash the password
-  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
+  const hashedPassword: string = await bcrypt.hash(payload.password, 12);
 
   // prepare data for user table
   const userData = {
-    email: req.body.data.email,
+    email: payload.data.email,
     password: hashedPassword,
-    role: UserRole.ADMIN,
+    role:
+      payload.role === UserRole.SUPER_ADMIN
+        ? UserRole.SUPER_ADMIN
+        : UserRole.ADMIN,
   };
 
   const result = await prisma.$transaction(async (transactionClient) => {
@@ -38,7 +49,7 @@ const createAdminIntoDB = async (req: Request) => {
 
     // create into admin table
     const createdAdminData = await transactionClient.admin.create({
-      data: req.body.data,
+      data: payload.data,
     });
 
     return createdAdminData;

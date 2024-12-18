@@ -6,7 +6,7 @@ import { Request } from "express";
 import { TAuthUser } from "../../interface/common";
 
 const createAdmin = catchAsync(async (req, res) => {
-  const result = await UserServices.createAdminIntoDB(req);
+  const result = await UserServices.createAdminIntoDB(req.body);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

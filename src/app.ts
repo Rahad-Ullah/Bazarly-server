@@ -8,7 +8,7 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "https://bazarly-client.vercel.app"],
     credentials: true,
   })
 );
