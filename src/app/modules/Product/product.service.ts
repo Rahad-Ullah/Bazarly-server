@@ -135,7 +135,7 @@ const getAllProductsFromDB = async (
     category,
     minPrice,
     maxPrice,
-    shopId,
+    vendorEmail,
     userEmail,
     ...filterData
   } = params;
@@ -207,9 +207,13 @@ const getAllProductsFromDB = async (
   }
 
   // filter if shopId specified
-  if (shopId) {
+  if (vendorEmail) {
     conditions.push({
-      shopId,
+      shop: {
+        vendor: {
+          email: vendorEmail,
+        },
+      },
     });
   }
 
@@ -218,7 +222,7 @@ const getAllProductsFromDB = async (
     isDeleted: false,
   });
 
-  // get the customer data
+  // get the customer data for prioritized his followed shops
   const customerData = userEmail
     ? await prisma.customer.findUnique({
         where: {
