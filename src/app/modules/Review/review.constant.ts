@@ -1,7 +1,7 @@
 export const reviewFilterableFields = [
   "name",
   "description",
-  "shopId",
+  "vendorEmail",
   "searchTerm",
 ];
 

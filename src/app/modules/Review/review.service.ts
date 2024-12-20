@@ -128,7 +128,8 @@ const getShopReviews = async (id: string) => {
   const reviews = await prisma.review.findMany({
     where: {
       product: {
-        shopId: shopData.id
+        shopId: shopData.id,
+        status: "ACTIVE",
       },
       isDeleted: false,
     },
@@ -140,7 +141,7 @@ const getShopReviews = async (id: string) => {
   const avgRating = await prisma.review.aggregate({
     where: {
       product: {
-        shopId: shopData.id
+        shopId: shopData.id,
       },
       isDeleted: false,
     },
@@ -162,7 +163,7 @@ const getAllReviewsFromDB = async (
 ) => {
   // format params and options information
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
-  const { searchTerm, shopId, ...filterData } = params;
+  const { searchTerm, vendorEmail, ...filterData } = params;
 
   const conditions: Prisma.ReviewWhereInput[] = [];
 
@@ -206,10 +207,15 @@ const getAllReviewsFromDB = async (
   }
 
   // filter for shop
-  if (shopId) {
+  if (vendorEmail) {
     conditions.push({
       product: {
-        shopId,
+        shop: {
+          vendor: {
+            email: vendorEmail,
+          },
+        },
+        status: "ACTIVE",
       },
     });
   }
@@ -226,6 +232,10 @@ const getAllReviewsFromDB = async (
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
+    },
+    include: {
+      product: true,
+      customer: true,
     },
   });
 
