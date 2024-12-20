@@ -3,6 +3,8 @@ import { ProductControllers } from "./product.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 import { fileUploader } from "../../utils/fileUploader";
+import validateRequest from "../../middlewares/validateRequest";
+import { ProductValidations } from "./product.validation";
 
 const router = express.Router();
 
@@ -19,6 +21,7 @@ router.post(
 router.post(
   "/duplicate",
   auth(UserRole.VENDOR),
+  validateRequest(ProductValidations.duplicate),
   ProductControllers.duplicateProduct
 );
 

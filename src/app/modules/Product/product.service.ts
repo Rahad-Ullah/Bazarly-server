@@ -19,6 +19,8 @@ const createProductIntoDB = async (user: TAuthUser, req: Request) => {
       vendor: {
         email: user?.email,
       },
+      isDeleted: false,
+      status: "ACTIVE",
     },
   });
   if (!shopData) {
