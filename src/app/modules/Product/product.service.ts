@@ -222,6 +222,7 @@ const getAllProductsFromDB = async (
   // filter non deleted items
   conditions.push({
     isDeleted: false,
+    status: "ACTIVE",
   });
 
   // get the customer data for prioritized his followed shops

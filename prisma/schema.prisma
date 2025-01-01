@@ -305,6 +305,14 @@ model Payment {
   @@map("payments")
 }
 
+model Newsletter {
+  id        String   @id @default(uuid())
+  email     String
+  createdAt DateTime @default(now())
+
+  @@map("newsletters")
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN

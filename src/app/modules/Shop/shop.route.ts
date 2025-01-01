@@ -9,11 +9,7 @@ import { ShopValidations } from "./shop.validation";
 const router = express.Router();
 
 // get all shops
-router.get(
-  "/",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  ShopControllers.getAllShops
-);
+router.get("/", ShopControllers.getAllShops);
 
 // get single shop by shopId
 router.get(
