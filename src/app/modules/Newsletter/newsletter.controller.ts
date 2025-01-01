@@ -15,6 +15,19 @@ const createNewsletter = catchAsync(async (req, res) => {
   });
 });
 
+// get all newsletters
+const getAllNewsletters = catchAsync(async (req, res) => {
+  const result = await NewsletterService.getAllNewslettersFromDB()
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Newsletters retrieved successfully",
+    data: result,
+  });
+});
+
 export const NewsletterControllers = {
   createNewsletter,
+  getAllNewsletters,
 };

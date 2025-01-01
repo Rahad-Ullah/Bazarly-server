@@ -14,6 +14,7 @@ import { CouponRoutes } from "../modules/Coupon/coupon.route";
 import { ReviewRoutes } from "../modules/Review/review.route";
 import { FollowedShopRoutes } from "../modules/FollowedShop/followedShop.route";
 import { RecentViewedRoutes } from "../modules/RecentViewedProduct/recentViewed.route";
+import { NewsletterRoutes } from "../modules/Newsletter/newsletter.route";
 
 const router = express.Router();
 
@@ -77,6 +78,10 @@ const moduleRoutes = [
   {
     path: "/recent-viewed-products",
     route: RecentViewedRoutes,
+  },
+  {
+    path: "/newsletters",
+    route: NewsletterRoutes,
   },
 ];
 

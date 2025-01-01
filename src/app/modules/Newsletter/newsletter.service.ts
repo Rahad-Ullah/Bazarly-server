@@ -20,6 +20,13 @@ const createNewsletterIntoDB = async (payload: Newsletter) => {
   return result;
 };
 
+const getAllNewslettersFromDB = async () => {
+  const result = await prisma.newsletter.findMany();
+
+  return result;
+};
+
 export const NewsletterService = {
   createNewsletterIntoDB,
+  getAllNewslettersFromDB,
 };
