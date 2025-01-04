@@ -59,7 +59,7 @@ const getShopFollowers = catchAsync(async (req, res) => {
   const filters = pick(req.query, followedShopFilterableFields);
   const options = pick(req.query, paginationOptions);
   const result = await FollowedShopServices.getShopFollowersFromDB(
-    req.params.shopId,
+    req.params.vendorEmail,
     filters,
     options
   );

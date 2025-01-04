@@ -112,6 +112,9 @@ const getAllShopsFromDB = async (
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      vendor: true,
+    },
   });
 
   // count total

@@ -14,8 +14,13 @@ router.get(
 
 // get shop follwers
 router.get(
-  "/followers/:shopId",
-  auth(UserRole.CUSTOMER, UserRole.VENDOR, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  "/followers/:vendorEmail",
+  auth(
+    UserRole.CUSTOMER,
+    UserRole.VENDOR,
+    UserRole.ADMIN,
+    UserRole.SUPER_ADMIN
+  ),
   FollowedShopControllers.getShopFollowers
 );
 

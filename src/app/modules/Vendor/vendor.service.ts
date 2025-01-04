@@ -52,6 +52,9 @@ const getAllVendorsFromDB = async (
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      user: true,
+    },
   });
 
   // count total

@@ -114,7 +114,7 @@ const getUserFollowedShopsFromDB = async (user: TAuthUser) => {
 
 // **********--- get all customers ---**********
 const getShopFollowersFromDB = async (
-  shopId: string,
+  vendorEmail: string,
   params: IFollowedShopFilterRequest,
   options: IPaginationOptions
 ) => {
@@ -151,7 +151,11 @@ const getShopFollowersFromDB = async (
   }
   // filter by shop
   conditions.push({
-    shopId,
+    shop: {
+      vendor: {
+        email: vendorEmail,
+      },
+    },
   });
 
   // execute query
